@@ -6,7 +6,12 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->setFixedSize(480, 320);
+    widgetStack = new QStackedWidget(this);
+    startPage = new StartPage;
+    widgetStack->addWidget(startPage);
+    widgetStack->setCurrentWidget(startPage);
+    setCentralWidget(widgetStack);
+    // connect(startPage &StartPage::startClicked, this, &MainWindow::showMainPage);
 }
 
 MainWindow::~MainWindow()
@@ -14,3 +19,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::showMainPage() {
+    //
+}

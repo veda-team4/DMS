@@ -17,6 +17,9 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
+        startpage.cpp
+        startpage.h
+        startpage.ui
         resources.qrc
 )
 
