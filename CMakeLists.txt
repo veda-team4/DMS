@@ -14,12 +14,9 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
         main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        mainwindow.ui
-        startpage.cpp
-        startpage.h
-        startpage.ui
+        mainwindow.cpp mainwindow.h mainwindow.ui
+        startpage.cpp startpage.h startpage.ui
+        camsetpage.h camsetpage.cpp camsetpage.ui
         resources.qrc
 )
 

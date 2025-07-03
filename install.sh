@@ -1,0 +1,1 @@
+sudo apt-get install qtcreator qtbase5-dev qtchooser qtbase5-dev-tools

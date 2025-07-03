@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QStackedWidget>
 #include "startpage.h"
+#include "camsetpage.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -15,10 +16,11 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 private slots:
-    void showMainPage();
+    void showCamSetPage();
 private:
     QStackedWidget* widgetStack;
     StartPage* startPage;
+    CamSetPage* camSetPage;
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H
