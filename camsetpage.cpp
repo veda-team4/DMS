@@ -3,12 +3,51 @@
 
 CamSetPage::CamSetPage(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::CamSetPage)
+    ui(new Ui::CamSetPage),
+    socket(new QLocalSocket(this))
 {
     ui->setupUi(this);
+
+    socket->connectToServer(SOCKET_PATH);
+
+    if (socket->state() != QLocalSocket::ConnectedState) {
+        qDebug() << "Socket connection error:" << socket->errorString();
+    }
+
+    connect(socket, &QLocalSocket::readyRead, this, &CamSetPage::readFrame);
 }
 
 CamSetPage::~CamSetPage()
 {
+    if(socket->isOpen()) {
+        socket->disconnectFromServer();
+    }
     delete ui;
+}
+
+void CamSetPage::readFrame()
+{
+    buffer.append(socket->readAll());
+
+    while (true) {
+        if (expectedSize == -1 && buffer.size() >= 4) {
+            expectedSize = *reinterpret_cast<const quint32*>(buffer.constData());
+            buffer.remove(0, 4);
+        }
+
+        if (expectedSize != -1 && buffer.size() >= expectedSize) {
+            QByteArray imageData = buffer.left(expectedSize);
+            buffer.remove(0, expectedSize);
+            expectedSize = -1;
+
+            QPixmap pixmap;
+            if (pixmap.loadFromData(imageData, "JPG")) {
+                ui->videoLabel->setPixmap(
+                    pixmap.scaled(ui->videoLabel->size(), Qt::KeepAspectRatio)
+                );
+            }
+        } else {
+            break;
+        }
+    }
 }
