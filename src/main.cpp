@@ -4,6 +4,10 @@
 #include "functions.h"
 
 int main(int argc, char** argv) {
+  if (argc == 1) {
+    std::cout << "Usage: %s <type>" << std::endl;
+    return -1;
+  }
   if (strcmp(argv[1], "camsetpage") == 0) {
     int ret = camsetpage();
     if (ret == -1) {

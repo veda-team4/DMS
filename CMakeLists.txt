@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(main)
+project(camera_server)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Release)
@@ -23,10 +23,10 @@ set_target_properties(dlib PROPERTIES
 )
 
 # Main executable
-add_executable(main
+add_executable(camera_server
  src/main.cpp
  src/threads.cpp
  src/camsetpage.cpp
  )
 
-target_link_libraries(main ${OpenCV_LIBS} dlib)
+target_link_libraries(camera_server ${OpenCV_LIBS} dlib)

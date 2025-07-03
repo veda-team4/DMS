@@ -8,6 +8,8 @@
 #include <iostream>
 #include "threads.h"
 
+#define SOCKET_PATH "./.face_socket"
+
 int camsetpage() {
   // 쓰레드와의 공유 변수
   dlib::rectangle biggestFaceRect; // 가장 큰 얼굴 사각형
@@ -30,13 +32,11 @@ int camsetpage() {
     return -1;
   }
 
-  std::string socketPath = std::string(getenv("HOME")) + "/.face_socket";
-
   sockaddr_un addr;
   memset(&addr, 0, sizeof(addr));
   addr.sun_family = AF_UNIX;
-  strncpy(addr.sun_path, socketPath.c_str(), sizeof(addr.sun_path) - 1);
-  unlink(socketPath.c_str());
+  strncpy(addr.sun_path, SOCKET_PATH, sizeof(addr.sun_path) - 1);
+  unlink(SOCKET_PATH);
 
   if (bind(server_fd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
     perror("bind");
@@ -95,7 +95,7 @@ int camsetpage() {
 
   close(client_fd);
   close(server_fd);
-  unlink(socketPath.c_str());
+  unlink(SOCKET_PATH);
   running = false;
   faceThread.join();
 
