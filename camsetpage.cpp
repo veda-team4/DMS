@@ -3,11 +3,21 @@
 
 CamSetPage::CamSetPage(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::CamSetPage),
-    socket(new QLocalSocket(this))
+    ui(new Ui::CamSetPage)
 {
     ui->setupUi(this);
 
+    serverProcess = new QProcess(this);
+    socket = new QLocalSocket(this);
+
+    serverProcess->setWorkingDirectory(SERVER_PATH);
+    serverProcess->start(QString(SERVER_PATH) + QString("/camera_server"), QStringList());
+
+    if(!serverProcess->waitForStarted()) {
+        qDebug() << "Failed to start server";
+    }
+
+    QThread::sleep(1);
     socket->connectToServer(SOCKET_PATH);
 
     if (socket->state() != QLocalSocket::ConnectedState) {

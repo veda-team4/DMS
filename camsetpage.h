@@ -5,8 +5,12 @@
 #include <QLocalSocket>
 #include <QBuffer>
 #include <QPixmap>
+#include <QProcess>
+#include <QThread>
+#include <QTimer>
 
-#define SOCKET_PATH "/home/jinhyeok/ear_qt/camera/.face_socket"
+#define SERVER_PATH "/home/jinhyeok/camera_server/build"
+#define SOCKET_PATH "/home/jinhyeok/camera_server/build/.face_socket"
 
 namespace Ui {
 class CamSetPage;
@@ -28,6 +32,7 @@ private:
     QLocalSocket* socket;
     QByteArray buffer;
     int expectedSize = -1;
+    QProcess* serverProcess;
 };
 
 #endif // CAMSETPAGE_H
