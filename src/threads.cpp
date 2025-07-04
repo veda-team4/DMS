@@ -1,6 +1,8 @@
 #include "threads.h"
 
-void runFaceDetectionThread(std::atomic<bool>& running, dlib::frontal_face_detector& detector, cv::Mat& sharedFrame, std::mutex& frameMutex, dlib::rectangle& biggestFaceRect, bool& hasFace, std::mutex& faceMutex) {
+void runFaceDetectionThread(std::atomic<bool>& running,
+  dlib::frontal_face_detector& detector, cv::Mat& sharedFrame, std::mutex& frameMutex,
+  dlib::rectangle& biggestFaceRect, bool& hasFace, std::mutex& faceMutex) {
   while (running) {
     cv::Mat localFrame;
     {
