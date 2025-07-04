@@ -6,15 +6,23 @@ CamSetPage::CamSetPage(QWidget *parent, QLocalSocket* socket) :
     ui(new Ui::CamSetPage)
 {
     ui->setupUi(this);
-    connect(socket, &QLocalSocket::readyRead, this, &CamSetPage::readFrame);
 }
 
 CamSetPage::~CamSetPage()
 {
-    if(socket->isOpen()) {
-        socket->disconnectFromServer();
-    }
     delete ui;
+}
+
+void CamSetPage::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    connect(socket, &QLocalSocket::readyRead, this, &CamSetPage::readFrame);
+}
+
+void CamSetPage::hideEvent(QHideEvent *event)
+{
+    QWidget::hideEvent(event);
+    disconnect(socket, &QLocalSocket::readyRead, this, &CamSetPage::readFrame);
 }
 
 void CamSetPage::readFrame()

@@ -36,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+    socket->disconnectFromServer();
 }
 
 void MainWindow::showCamSetPage() {

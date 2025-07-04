@@ -29,6 +29,10 @@ private:
     QLocalSocket* socket;
     QByteArray buffer;
     int expectedSize = -1;
+
+protected:
+    void showEvent(QShowEvent* event) override;
+    void hideEvent(QHideEvent* event) override;
 };
 
 #endif // CAMSETPAGE_H
