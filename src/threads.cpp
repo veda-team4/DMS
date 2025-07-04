@@ -1,8 +1,16 @@
 #include "threads.h"
 
-void runFaceDetectionThread(std::atomic<bool>& running,
-  dlib::frontal_face_detector& detector, cv::Mat& sharedFrame, std::mutex& frameMutex,
-  dlib::rectangle& biggestFaceRect, bool& hasFace, std::mutex& faceMutex) {
+extern dlib::shape_predictor sp;
+extern dlib::rectangle biggestFaceRect; // Biggest face rectangle
+extern bool hasFace; // Whether face recongition
+extern std::mutex faceMutex; // Mutex for the above two variables
+extern cv::Mat sharedFrame; // Frame for thread
+extern std::mutex frameMutex; // Mutex for the above variable
+extern std::atomic<bool> running; // Control whether thread runs
+
+void runFaceDetectionThread() {
+  dlib::frontal_face_detector detector = dlib::get_frontal_face_detector();
+  dlib::deserialize("../model/shape_predictor_68_face_landmarks.dat") >> sp;
   while (running) {
     cv::Mat localFrame;
     {

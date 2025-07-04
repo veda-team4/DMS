@@ -8,25 +8,18 @@
 #include <dlib/image_processing/frontal_face_detector.h>
 #include "threads.h"
 
+// Shared variable declaration
 extern cv::VideoCapture cap;
-extern dlib::frontal_face_detector detector;
 extern int server_fd, client_fd;
 
+extern dlib::rectangle biggestFaceRect; // Biggest face rectangle
+extern bool hasFace; // Whether face recongition
+extern std::mutex faceMutex; // Mutex for the above two variables
+extern cv::Mat sharedFrame; // Frame for thread
+extern std::mutex frameMutex; // Mutex for the above variable
+extern std::atomic<bool> running; // Control whether thread runs
+
 int camsetpage() {
-  // Shared variable declaration
-  dlib::rectangle biggestFaceRect; // Biggest face rectangle
-  bool hasFace = false; // Whether face recongition
-  std::mutex faceMutex; // Mutex for the above two variables
-  cv::Mat sharedFrame; // Frame for thread
-  std::mutex frameMutex; // Mutex for the above variable
-  std::atomic<bool> running = true; // Control whether thread runs
-
-  // Run face detection thread
-  std::thread faceThread(runFaceDetectionThread,
-    std::ref(running), std::ref(detector), std::ref(sharedFrame),
-    std::ref(frameMutex), std::ref(biggestFaceRect), std::ref(hasFace),
-    std::ref(faceMutex));
-
   while (true) {
     cv::Mat frame;
     cap >> frame;
@@ -63,9 +56,6 @@ int camsetpage() {
     if (write(client_fd, &size, sizeof(size)) != sizeof(size)) break;
     if (write(client_fd, buf.data(), size) != size) break;
   }
-
-  running = false;
-  faceThread.join();
 
   return 0;
 }

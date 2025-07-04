@@ -9,9 +9,16 @@
 
 #define SOCKET_PATH "/home/jinhyeok/camera_server/build/.face_socket"
 
+// Shared variable declaration
 cv::VideoCapture cap;
-dlib::frontal_face_detector detector;
 dlib::shape_predictor sp;
+
+dlib::rectangle biggestFaceRect; // Biggest face rectangle
+bool hasFace = false; // Whether face recongition
+std::mutex faceMutex; // Mutex for the above two variables
+cv::Mat sharedFrame; // Frame for thread
+std::mutex frameMutex; // Mutex for the above variable
+std::atomic<bool> running = true; // Control whether thread runs
 
 int server_fd, client_fd;
 
@@ -43,24 +50,19 @@ int main(void) {
     return -1;
   }
   std::cout << "Client connected !" << std::endl;
-  // ----------------------------------------------
 
-  // 1. Set camera and dlib library
+  // 1. Set camera
   cap.open(0, cv::CAP_V4L2);
   if (!cap.isOpened()) {
     std::cerr << "Camera open failed\n";
     return -1;
   }
-  detector = dlib::get_frontal_face_detector();
-  dlib::deserialize("../model/shape_predictor_68_face_landmarks.dat") >> sp;
-  // ----------------------------------------------
+
+  // 2. Run face detection thread
+  std::thread faceThread(runFaceDetectionThread);
 
   camsetpage();
-
-  // 1. Create camera input thread.
-  // Receive frames from the camera and perform face recognition and landmark calculations.
-
-  // ----------------------------------------------
-
+  running = false;
+  faceThread.join();
   return 0;
 }
