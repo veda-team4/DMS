@@ -10,6 +10,11 @@ MainWindow::MainWindow(QWidget *parent)
     serverProcess = new QProcess(this);
     socket = new QLocalSocket(this);
 
+    connect(serverProcess, &QProcess::readyReadStandardOutput, this, [=]() {
+        QByteArray output = serverProcess->readAllStandardOutput();
+        qDebug() << output;  // ? ?? Qt Creator Output? ??!
+    });
+
     serverProcess->setWorkingDirectory(SERVER_PATH);
     serverProcess->start(QString(SERVER_PATH) + QString("/camera_server"), QStringList());
 
@@ -47,8 +52,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::showCamSetPage() {
     widgetStack->setCurrentWidget(camSetPage);
+    camSetPage->activated();
 }
 
 void MainWindow::showCalibratePage() {
     widgetStack->setCurrentWidget(calibratePage);
+    camSetPage->deactivated();
+    calibratePage->activated();
 }

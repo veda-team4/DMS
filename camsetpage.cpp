@@ -1,5 +1,6 @@
 #include "camsetpage.h"
 #include "ui_camsetpage.h"
+#include "functions.h"
 
 CamSetPage::CamSetPage(QWidget *parent, QLocalSocket* socket) :
     QWidget(parent), socket(socket),
@@ -14,19 +15,13 @@ CamSetPage::~CamSetPage()
     delete ui;
 }
 
-void CamSetPage::showEvent(QShowEvent *event)
-{
-    QWidget::showEvent(event);
-    socket->write("camsetpage\n");
-    socket->flush();
+void CamSetPage::activated() {
+    sendCommand("camset", socket);
     connect(socket, &QLocalSocket::readyRead, this, &CamSetPage::readFrame);
 }
 
-void CamSetPage::hideEvent(QHideEvent *event)
-{
-    QWidget::hideEvent(event);
-    socket->write("stop\n");
-    socket->flush();
+void CamSetPage::deactivated() {
+    sendCommand("stop", socket);
     disconnect(socket, &QLocalSocket::readyRead, this, &CamSetPage::readFrame);
 }
 

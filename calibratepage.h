@@ -22,6 +22,13 @@ public:
     ~CalibratePage();
 
 private:
+    void readFrame();
+
+public:
+    void activated();
+    void deactivated();
+
+private:
     Ui::CalibratePage *ui;
     QLocalSocket* socket;
     QByteArray buffer;
