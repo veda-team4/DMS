@@ -16,6 +16,8 @@ CamSetPage::~CamSetPage()
 void CamSetPage::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
+    socket->write("camsetpage\n");
+    socket->flush();
     connect(socket, &QLocalSocket::readyRead, this, &CamSetPage::readFrame);
 }
 
