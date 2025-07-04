@@ -61,8 +61,36 @@ int main(void) {
   // 2. Run face detection thread
   std::thread faceThread(runFaceDetectionThread);
 
-  camsetpage();
+  while (running) {
+    char commandBuffer[64];
+    ssize_t bytesRead;
+    memset(commandBuffer, 0, sizeof(commandBuffer));
+    bytesRead = read(client_fd, commandBuffer, sizeof(commandBuffer) - 1);
+    if (bytesRead > 0) {
+      std::string command(commandBuffer);
+      command.erase(command.find_last_not_of(" \n\r\t") + 1);
+
+      if (command == "camsetpage") {
+        camsetpage();
+      }
+      else if (command == "stop") {
+        running = false;
+      }
+    }
+    else if (bytesRead == 0) {
+      std::cout << "Client disconnected.\n";
+      break;
+    }
+    else {
+      perror("read");
+      break;
+    }
+  }
+
   running = false;
   faceThread.join();
+  close(client_fd);
+  close(server_fd);
+  unlink(SOCKET_PATH);
   return 0;
 }
