@@ -22,17 +22,15 @@ extern std::atomic<bool> running; // Control whether thread runs
 int camsetpage() {
   while (true) {
     // Break when client sends "stop"
-    char cmdBuf[64];
-    ssize_t bytesRead;
-    memset(cmdBuf, 0, sizeof(cmdBuf));
-    bytesRead = recv(client_fd, cmdBuf, sizeof(cmdBuf) - 1, MSG_DONTWAIT);
-    if (bytesRead > 0) {
-      std::string command(cmdBuf);
-      std::cout << "client message: " << command << std::endl;
-      if (command == "stop") {
-        std::cout << "client message: stop" << std::endl;
-        return 0;
-      }
+    uint8_t lenByte;
+    char cmdBuf[64] = {0, };
+    recv(client_fd, &lenByte, 1, MSG_DONTWAIT);
+    recv(client_fd, cmdBuf, lenByte, MSG_DONTWAIT);
+    std::string command(cmdBuf);
+    std::cout << "client message: " << command << std::endl;
+    if (command == "stop") {
+      std::cout << "client message: stop" << std::endl;
+      return 0;
     }
 
     cv::Mat frame;
