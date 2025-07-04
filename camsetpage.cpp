@@ -1,29 +1,11 @@
 #include "camsetpage.h"
 #include "ui_camsetpage.h"
 
-CamSetPage::CamSetPage(QWidget *parent) :
-    QWidget(parent),
+CamSetPage::CamSetPage(QWidget *parent, QLocalSocket* socket) :
+    QWidget(parent), socket(socket),
     ui(new Ui::CamSetPage)
 {
     ui->setupUi(this);
-
-    serverProcess = new QProcess(this);
-    socket = new QLocalSocket(this);
-
-    serverProcess->setWorkingDirectory(SERVER_PATH);
-    serverProcess->start(QString(SERVER_PATH) + QString("/camera_server"), QStringList());
-
-    if(!serverProcess->waitForStarted()) {
-        qDebug() << "Failed to start server";
-    }
-
-    QThread::sleep(1);
-    socket->connectToServer(SOCKET_PATH);
-
-    if (socket->state() != QLocalSocket::ConnectedState) {
-        qDebug() << "Socket connection error:" << socket->errorString();
-    }
-
     connect(socket, &QLocalSocket::readyRead, this, &CamSetPage::readFrame);
 }
 

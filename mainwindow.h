@@ -6,6 +6,9 @@
 #include "startpage.h"
 #include "camsetpage.h"
 
+#define SERVER_PATH "/home/jinhyeok/camera_server/build"
+#define SOCKET_PATH "/home/jinhyeok/camera_server/build/.face_socket"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -22,5 +25,8 @@ private:
     StartPage* startPage;
     CamSetPage* camSetPage;
     Ui::MainWindow *ui;
+
+    QProcess* serverProcess;
+    QLocalSocket* socket;
 };
 #endif // MAINWINDOW_H

@@ -9,9 +9,6 @@
 #include <QThread>
 #include <QTimer>
 
-#define SERVER_PATH "/home/jinhyeok/camera_server/build"
-#define SOCKET_PATH "/home/jinhyeok/camera_server/build/.face_socket"
-
 namespace Ui {
 class CamSetPage;
 }
@@ -21,7 +18,7 @@ class CamSetPage : public QWidget
     Q_OBJECT
 
 public:
-    explicit CamSetPage(QWidget *parent = nullptr);
+    explicit CamSetPage(QWidget *parent, QLocalSocket* socket);
     ~CamSetPage();
 
 private:
@@ -32,7 +29,6 @@ private:
     QLocalSocket* socket;
     QByteArray buffer;
     int expectedSize = -1;
-    QProcess* serverProcess;
 };
 
 #endif // CAMSETPAGE_H
