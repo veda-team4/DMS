@@ -62,13 +62,12 @@ int main(void) {
   std::thread faceThread(runFaceDetectionThread);
 
   while (running) {
-    char commandBuffer[64];
+    char cmdBuf[64];
     ssize_t bytesRead;
-    memset(commandBuffer, 0, sizeof(commandBuffer));
-    bytesRead = read(client_fd, commandBuffer, sizeof(commandBuffer) - 1);
+    memset(cmdBuf, 0, sizeof(cmdBuf));
+    bytesRead = read(client_fd, cmdBuf, sizeof(cmdBuf) - 1);
     if (bytesRead > 0) {
-      std::string command(commandBuffer);
-      command.erase(command.find_last_not_of(" \n\r\t") + 1);
+      std::string command(cmdBuf);
 
       if (command == "camsetpage") {
         camsetpage();
