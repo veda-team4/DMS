@@ -1,1 +1,2 @@
 int camsetpage();
+int calibratepage();

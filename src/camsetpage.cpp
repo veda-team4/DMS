@@ -28,7 +28,9 @@ int camsetpage() {
     bytesRead = recv(client_fd, cmdBuf, sizeof(cmdBuf) - 1, MSG_DONTWAIT);
     if (bytesRead > 0) {
       std::string command(cmdBuf);
+      std::cout << "client message: " << command << std::endl;
       if (command == "stop") {
+        std::cout << "client message: stop" << std::endl;
         return 0;
       }
     }

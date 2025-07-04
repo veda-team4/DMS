@@ -27,6 +27,7 @@ add_executable(camera_server
  src/main.cpp
  src/threads.cpp
  src/camsetpage.cpp
+ src/calibratepage.cpp
  )
 
 target_link_libraries(camera_server ${OpenCV_LIBS} dlib)

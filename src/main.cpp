@@ -61,29 +61,55 @@ int main(void) {
   // 2. Run face detection thread
   std::thread faceThread(runFaceDetectionThread);
 
-  while (running) {
-    char cmdBuf[64];
-    ssize_t bytesRead;
-    memset(cmdBuf, 0, sizeof(cmdBuf));
-    bytesRead = read(client_fd, cmdBuf, sizeof(cmdBuf) - 1);
-    if (bytesRead > 0) {
-      std::string command(cmdBuf);
+  while (true) {
+    uint8_t lenByte;
+    ssize_t lenRead = read(client_fd, &lenByte, 1);
+    if (lenRead == 1) {
+      if (lenByte == 0 || lenByte >= 64) {
+        std::cout << "Invalid command length" << std::endl;
+        return -1;
+      }
+      char cmdBuf[64] = { 0 };
+      ssize_t totalRead = 0;
+      while (totalRead < lenByte) {
+        ssize_t n = read(client_fd, cmdBuf + totalRead, lenByte - totalRead);
+        if (n > 0) {
+          totalRead += n;
+        }
+        else if (n == 0) {
+          std::cout << "Client disconnected.\n";
+          break;
+        }
+        else {
+          perror("read");
+          break;
+        }
+      }
+      if (totalRead != lenByte) continue;
 
-      if (command == "camsetpage") {
+      std::string command(cmdBuf, lenByte);
+
+      std::cout << "Received command: " << command << std::endl;
+
+      if (command == "camset") {
         camsetpage();
       }
+      else if (command == "calibrate") {
+        calibratepage();
+      }
       else if (command == "stop") {
-        running = false;
+        break;
       }
     }
-    else if (bytesRead == 0) {
-      std::cout << "Client disconnected.\n";
+    else if (lenRead == 0) {
+      std::cout << "Client disconnected" << std::endl;
       break;
     }
     else {
-      perror("read");
+      perror("read()");
       break;
     }
+
   }
 
   running = false;
