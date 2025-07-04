@@ -25,6 +25,8 @@ void CamSetPage::showEvent(QShowEvent *event)
 void CamSetPage::hideEvent(QHideEvent *event)
 {
     QWidget::hideEvent(event);
+    socket->write("stop\n");
+    socket->flush();
     disconnect(socket, &QLocalSocket::readyRead, this, &CamSetPage::readFrame);
 }
 
