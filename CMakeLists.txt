@@ -16,7 +16,8 @@ set(PROJECT_SOURCES
         main.cpp
         mainwindow.cpp mainwindow.h mainwindow.ui
         startpage.cpp startpage.h startpage.ui
-        camsetpage.h camsetpage.cpp camsetpage.ui
+        camsetpage.cpp camsetpage.h camsetpage.ui
+        calibratepage.cpp calibratepage.h calibratepage.ui
         resources.qrc
 )
 

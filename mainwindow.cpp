@@ -5,6 +5,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    ui->setupUi(this);
+
     serverProcess = new QProcess(this);
     socket = new QLocalSocket(this);
 
@@ -22,15 +24,19 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "Socket connection error:" << socket->errorString();
     }
 
-    ui->setupUi(this);
-    widgetStack = new QStackedWidget(this);
     startPage = new StartPage;
     camSetPage = new CamSetPage(nullptr, socket);
+    calibratePage = new CalibratePage(nullptr, socket);
+
+    widgetStack = new QStackedWidget(this);
     widgetStack->addWidget(startPage);
     widgetStack->addWidget(camSetPage);
+    widgetStack->addWidget(calibratePage);
     widgetStack->setCurrentWidget(startPage);
     setCentralWidget(widgetStack);
-    connect(startPage, &StartPage::startClicked, this, &MainWindow::showCamSetPage);
+
+    connect(startPage, &StartPage::nextClicked, this, &MainWindow::showCamSetPage);
+    connect(camSetPage, &CamSetPage::nextClicked, this, &MainWindow::showCalibratePage);
 }
 
 MainWindow::~MainWindow()
@@ -41,4 +47,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::showCamSetPage() {
     widgetStack->setCurrentWidget(camSetPage);
+}
+
+void MainWindow::showCalibratePage() {
+    widgetStack->setCurrentWidget(calibratePage);
 }

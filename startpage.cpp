@@ -6,7 +6,7 @@ StartPage::StartPage(QWidget *parent) :
     ui(new Ui::StartPage)
 {
     ui->setupUi(this);
-    connect(ui->startButton, &QPushButton::clicked, this, &StartPage::startClicked);
+    connect(ui->nextButton, &QPushButton::clicked, this, &StartPage::nextClicked);
 }
 
 StartPage::~StartPage()

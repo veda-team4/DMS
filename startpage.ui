@@ -93,7 +93,7 @@
     </spacer>
    </item>
    <item alignment="Qt::AlignHCenter">
-    <widget class="QPushButton" name="startButton">
+    <widget class="QPushButton" name="nextButton">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
        <horstretch>0</horstretch>

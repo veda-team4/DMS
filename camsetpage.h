@@ -21,6 +21,9 @@ public:
     explicit CamSetPage(QWidget *parent, QLocalSocket* socket);
     ~CamSetPage();
 
+signals:
+    void nextClicked();
+
 private:
     void readFrame();
 

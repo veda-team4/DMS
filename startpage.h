@@ -13,7 +13,7 @@ public:
     explicit StartPage(QWidget *parent = nullptr);
     ~StartPage();
 signals:
-    void startClicked();
+    void nextClicked();
 
 private:
     Ui::StartPage *ui;

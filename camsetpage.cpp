@@ -6,6 +6,7 @@ CamSetPage::CamSetPage(QWidget *parent, QLocalSocket* socket) :
     ui(new Ui::CamSetPage)
 {
     ui->setupUi(this);
+    connect(ui->nextButton, &QPushButton::clicked, this, &CamSetPage::nextClicked);
 }
 
 CamSetPage::~CamSetPage()
