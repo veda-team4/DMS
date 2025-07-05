@@ -35,7 +35,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Calibrate eye size</string>
+      <string>Calibrate opened eye size. Please open your eyes.</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>

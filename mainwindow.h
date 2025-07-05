@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QStackedWidget>
+#include <QProcess>
+#include <QLocalSocket>
 #include "startpage.h"
 #include "camsetpage.h"
 #include "calibratepage.h"
@@ -15,21 +17,21 @@ namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow {
-    Q_OBJECT
+  Q_OBJECT
 public:
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+  MainWindow(QWidget* parent = nullptr);
+  ~MainWindow();
 private slots:
-    void showCamSetPage();
-    void showCalibratePage();
+  void showCamSetPage();
+  void showCalibratePage();
 private:
-    QStackedWidget* widgetStack;
-    StartPage* startPage;
-    CamSetPage* camSetPage;
-    CalibratePage* calibratePage;
-    Ui::MainWindow *ui;
+  QStackedWidget* widgetStack;
+  StartPage* startPage;
+  CamSetPage* camSetPage;
+  CalibratePage* calibratePage;
+  Ui::MainWindow* ui;
 
-    QProcess* serverProcess;
-    QLocalSocket* socket;
+  QProcess* serverProcess;
+  QLocalSocket* socket;
 };
 #endif // MAINWINDOW_H

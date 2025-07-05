@@ -1,8 +1,8 @@
 #include "calibratepage.h"
 #include "ui_calibratepage.h"
-#include "functions.h"
+#include "utils.h"
 
-CalibratePage::CalibratePage(QWidget *parent, QLocalSocket* socket) :
+CalibratePage::CalibratePage(QWidget* parent, QLocalSocket* socket) :
     QWidget(parent), socket(socket),
     ui(new Ui::CalibratePage)
 {
@@ -45,7 +45,8 @@ void CalibratePage::readFrame()
                     pixmap.scaled(ui->videoLabel->size(), Qt::KeepAspectRatio)
                 );
             }
-        } else {
+        }
+        else {
             break;
         }
     }

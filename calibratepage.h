@@ -10,29 +10,25 @@
 #include <QTimer>
 
 namespace Ui {
-class CalibratePage;
+  class CalibratePage;
 }
 
-class CalibratePage : public QWidget
-{
-    Q_OBJECT
+class CalibratePage : public QWidget {
+  Q_OBJECT
 
 public:
-    explicit CalibratePage(QWidget *parent, QLocalSocket* socket);
-    ~CalibratePage();
+  explicit CalibratePage(QWidget* parent, QLocalSocket* socket);
+  ~CalibratePage();
+
+  void activated();
+  void deactivated();
 
 private:
-    void readFrame();
-
-public:
-    void activated();
-    void deactivated();
-
-private:
-    Ui::CalibratePage *ui;
-    QLocalSocket* socket;
-    QByteArray buffer;
-    int expectedSize = -1;
+  Ui::CalibratePage* ui;
+  QLocalSocket* socket;
+  QByteArray buffer;
+  int expectedSize = -1;
+  void readFrame();
 };
 
 #endif // CALIBRATEPAGE_H

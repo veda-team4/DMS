@@ -1,5 +1,5 @@
-#ifndef FUNCTIONS_H
-#define FUNCTIONS_H
+#ifndef UTILS_H
+#define UTILS_H
 
 #include <QString>
 #include <QLocalSocket>
@@ -7,4 +7,4 @@
 
 void sendCommand(std::string cmd, QLocalSocket* socket);
 
-#endif
+#endif // UTILS_H
