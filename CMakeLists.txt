@@ -25,6 +25,7 @@ set_target_properties(dlib PROPERTIES
 # Main executable
 add_executable(camera_server
  src/main.cpp
+ src/utils.cpp
  src/threads.cpp
  src/camsetpage.cpp
  src/calibratepage.cpp

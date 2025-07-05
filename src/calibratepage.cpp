@@ -7,17 +7,7 @@
 #include <dlib/image_processing.h>
 #include <dlib/image_processing/frontal_face_detector.h>
 #include "threads.h"
-
-// Shared variable declaration
-extern cv::VideoCapture cap;
-extern int server_fd, client_fd;
-
-extern dlib::rectangle biggestFaceRect; // Biggest face rectangle
-extern bool hasFace; // Whether face recongition
-extern std::mutex faceMutex; // Mutex for the above two variables
-extern cv::Mat sharedFrame; // Frame for thread
-extern std::mutex frameMutex; // Mutex for the above variable
-extern std::atomic<bool> running; // Control whether thread runs
+#include "global.h"
 
 int calibratepage() {
   // Open your eyes 단계
@@ -25,7 +15,6 @@ int calibratepage() {
     cv::Mat frame;
     cap >> frame;
     if (frame.empty()) continue;
-    cv::putText(frame, "Open your eyes.", cv::Point(30, 50), cv::FONT_HERSHEY_SIMPLEX, 0.8, cv::Scalar(0, 255, 255), 2); cv::imshow("Frame", frame);
 
     // send frame to client
     std::vector<uchar> buf;

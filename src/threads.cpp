@@ -1,27 +1,26 @@
 #include "threads.h"
+#include "global.h"
 
-extern dlib::shape_predictor sp;
-extern dlib::rectangle biggestFaceRect; // Biggest face rectangle
-extern bool hasFace; // Whether face recongition
-extern std::mutex faceMutex; // Mutex for the above two variables
-extern cv::Mat sharedFrame; // Frame for thread
-extern std::mutex frameMutex; // Mutex for the above variable
-extern std::atomic<bool> running; // Control whether thread runs
-
+// 얼굴 검출 쓰레드
 void runFaceDetectionThread() {
+  // 얼굴 및 랜드마크 검출 객체 할당
   dlib::frontal_face_detector detector = dlib::get_frontal_face_detector();
   dlib::deserialize("../model/shape_predictor_68_face_landmarks.dat") >> sp;
+
+  // 반복문 돌며 얼굴 검출하기
   while (running) {
-    cv::Mat localFrame;
+    cv::Mat localFrame; // 쓰레드에서 사용할 프레임 변수
     {
       std::lock_guard<std::mutex> lock(frameMutex);
       if (sharedFrame.empty()) continue;
-      sharedFrame.copyTo(localFrame);
+      sharedFrame.copyTo(localFrame); // sharedFrame localFrame에 복사
     }
 
+    // localFrame dlibFrame 으로 변환 후 얼굴 검출
     dlib::cv_image<dlib::bgr_pixel> dlibFrame(localFrame);
     std::vector<dlib::rectangle> faces = detector(dlibFrame);
 
+    // 검출된 가장 큰 얼굴 사각형 갱신
     {
       std::lock_guard<std::mutex> lock(faceMutex);
       if (faces.empty()) {
