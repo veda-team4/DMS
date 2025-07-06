@@ -21,17 +21,15 @@ int camsetpage() {
         char buf[64] = { 0, };
         readNBytes(client_fd, &dataLen, 4);
         readNBytes(client_fd, buf, dataLen);
-        std::cout << "[Server] message from client: " << buf << std::endl;
+        writeLog(std::string("message from client: ") + std::string(buf));
         if (strcmp(buf, "stop") == 0) {
           return 0;
         }
         else {
-          puts("Undefined situation");
           return -1;
         }
       }
       else {
-        puts("Undefined situation");
         return -1;
       }
     }

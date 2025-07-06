@@ -2,6 +2,6 @@
 #define FUNCTIONS_H
 
 int camsetpage();
-int calibratepage();
+int calibratepage(double&);
 
 #endif // FUNCTIONS_H

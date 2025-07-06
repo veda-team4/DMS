@@ -1,3 +1,4 @@
+#include <iostream>
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
@@ -57,4 +58,8 @@ int writeNBytes(int fd, const void* buf, int len) {
   }
 
   return totalWritten == len ? totalWritten : -1;
+}
+
+void writeLog(std::string log) {
+  std::cout << "[Server] " << log << std::endl;
 }
