@@ -55,7 +55,16 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 MainWindow::~MainWindow() {
   delete ui;
+  delete startPage;
+  delete camSetPage;
+  delete calibratePage;
+  delete widgetStack;
   socket->disconnectFromServer();
+  delete socket;
+  serverProcess->terminate();
+  if (!serverProcess->waitForFinished(3000)) {
+    serverProcess->kill();
+  }
 }
 
 void MainWindow::showCamSetPage() {

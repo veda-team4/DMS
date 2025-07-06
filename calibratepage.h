@@ -33,9 +33,12 @@ private:
   Ui::CalibratePage* ui;
   QLocalSocket* socket;
   QByteArray buffer;
+  QTimer* finishTimer;
   int expectedSize = -1;
   void readFrame();
   int clickCount = 0;
+  int progressStep = 0;
+  const int progressTotalSteps = 20;
 };
 
 #endif // CALIBRATEPAGE_H

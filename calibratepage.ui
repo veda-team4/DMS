@@ -45,12 +45,12 @@
        <property name="font">
         <font>
          <family>NanumGothic</family>
-         <pointsize>12</pointsize>
+         <pointsize>10</pointsize>
          <bold>true</bold>
         </font>
        </property>
        <property name="text">
-        <string>뜬 눈의 크기를 측정합니다.</string>
+        <string>뜬 눈의 크기를 측정합니다. 준비 완료 시 버튼을 눌러주세요.</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -89,6 +89,13 @@
    </item>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QProgressBar" name="progressBar">
+       <property name="value">
+        <number>24</number>
+       </property>
+      </widget>
+     </item>
      <item alignment="Qt::AlignHCenter">
       <widget class="QPushButton" name="nextButton">
        <property name="maximumSize">
