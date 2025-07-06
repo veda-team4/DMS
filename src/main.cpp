@@ -12,7 +12,7 @@
 #define SOCKET_PATH "/home/jinhyeok/camera_server/build/.face_socket"
 
 // ---------------------- 전역 상수 ----------------------
-#define EAR_THRESH_VAL 0.30 // EAR 임계값
+#define EAR_THRESH_VAL 0.30 // 감은 눈 EAR + (뜬 눈 EAR - 감은 눈 EAR) * X
 #define BLINK_RATIO_THRESH 0.6 // 눈 감은 비율 임계값
 #define BLINK_WINDOW_MS 2000 // 분석 시간 윈도우 (2초)
 
@@ -80,7 +80,7 @@ int main(void) {
   std::thread faceThread(runFaceDetectionThread);
 
   // 6. 루프 돌며 클라이언트로부터 명령 받아서 실행
-  double averageEAR;
+  double thresholdEAR;
   while (true) {
     uint8_t type;
     uint32_t dataLen;
@@ -97,7 +97,7 @@ int main(void) {
         }
       }
       else if (strcmp(buf, "calibrate") == 0) {
-        if (calibratepage(averageEAR) == -1) {
+        if (calibratepage(thresholdEAR) == -1) {
           writeLog("calibrate error");
           break;
         }

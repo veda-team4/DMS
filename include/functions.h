@@ -2,6 +2,6 @@
 #define FUNCTIONS_H
 
 int camsetpage();
-int calibratepage(double&);
+int calibratepage(double& thresholdEAR);
 
 #endif // FUNCTIONS_H

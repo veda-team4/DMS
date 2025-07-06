@@ -11,10 +11,10 @@
 #include "protocols.h"
 #include "utils.h"
 
-int waitingPage(const char*);
-int calibrateEyes(double&);
+int waitingPage(const char* msg);
+int calibrateEyes(double& ear);
 
-int calibratepage(double& averageEAR) {
+int calibratepage(double& thresholdEAR) {
   // 뜬 눈 EAR, 감은 눈 EAR
   double openedEAR, closedEAR;
 
@@ -38,7 +38,11 @@ int calibratepage(double& averageEAR) {
     return -1;
   }
 
-  averageEAR = closedEAR + (openedEAR - closedEAR) * 0.2;
+  thresholdEAR = closedEAR + (openedEAR - closedEAR) * EAR_THRESH_VAL;
+
+  writeLog(std::string("Opened: " + std::to_string(openedEAR)));
+  writeLog(std::string("Closed: " + std::to_string(closedEAR)));
+  writeLog(std::string("Threshold: ") + std::to_string(thresholdEAR));
   return 0;
 }
 
@@ -121,8 +125,11 @@ int waitingPage(const char* msg) {
   return 0;
 }
 
-int calibrateEyes(double& opened) {
-  // 클라이언트 측으로부터 finish 수신할 때까지 프레임 전송
+int calibrateEyes(double& ear) {
+  double earSum = 0.0;
+  int earCount = 0;
+
+  // 클라이언트 측으로부터 finish 수신할 때까지 프레임 전송하며 EAR 계산
   while (true) {
     uint8_t type;
     if (recv(client_fd, &type, 1, MSG_DONTWAIT) == 1) {
@@ -184,6 +191,9 @@ int calibrateEyes(double& opened) {
         dlib::point p = landmarks.part(landmarkIdx[i]);
         cv::circle(frame, cv::Point(p.x(), p.y()), 2, cv::Scalar(255, 0, 0), -1);
       }
+
+      earSum += (computeEAR(landmarks, 36) + computeEAR(landmarks, 42)) / 2.0;
+      ++earCount;
     }
 
     // 클라이언트에 프레임 전송하기
@@ -196,6 +206,8 @@ int calibrateEyes(double& opened) {
     if (writeNBytes(client_fd, &size, 4) == -1) return -1;
     if (writeNBytes(client_fd, buf.data(), size) == -1) return -1;
   }
+
+  ear = earSum / earCount;
 
   return 0;
 }
