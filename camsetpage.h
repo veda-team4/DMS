@@ -17,11 +17,11 @@ public:
   ~CamSetPage();
 
 signals:
-  void nextClicked();
+  void moveToNext();
 
 public:
-  void activated();
-  void deactivated();
+  void activate();
+  void deactivate();
 
 private:
   Ui::CamSetPage* ui;

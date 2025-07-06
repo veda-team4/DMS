@@ -4,19 +4,19 @@
 #include <QWidget>
 
 namespace Ui {
-class StartPage;
+    class StartPage;
 }
 
 class StartPage : public QWidget {
     Q_OBJECT
 public:
-    explicit StartPage(QWidget *parent = nullptr);
+    explicit StartPage(QWidget* parent = nullptr);
     ~StartPage();
 signals:
-    void nextClicked();
+    void moveToNext();
 
 private:
-    Ui::StartPage *ui;
+    Ui::StartPage* ui;
 };
 
 #endif // STARTPAGE_H

@@ -18,70 +18,97 @@
   </property>
   <property name="maximumSize">
    <size>
-    <width>480</width>
-    <height>320</height>
+    <width>16777215</width>
+    <height>16777215</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <widget class="QLabel" name="infoLabel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>500</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Please position the camera that clearly shows your face.</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QLabel" name="infoLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>360</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>360</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>NanumGothic</family>
+         <pointsize>12</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>얼굴이 잘 인식되는 각도로 카메라를 놓아주세요.</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="videoLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>360</width>
+         <height>270</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>360</width>
+         <height>270</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
-    <widget class="QLabel" name="videoLabel">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item alignment="Qt::AlignHCenter">
-    <widget class="QPushButton" name="nextButton">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Click to Next</string>
-     </property>
-    </widget>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item alignment="Qt::AlignHCenter">
+      <widget class="QPushButton" name="nextButton">
+       <property name="maximumSize">
+        <size>
+         <width>100</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Click to next</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

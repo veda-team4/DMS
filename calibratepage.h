@@ -20,8 +20,14 @@ public:
   explicit CalibratePage(QWidget* parent, QLocalSocket* socket);
   ~CalibratePage();
 
-  void activated();
-  void deactivated();
+  void activate();
+  void deactivate();
+
+private slots:
+  void moveToNextStep();
+
+signals:
+  void moveToNext();
 
 private:
   Ui::CalibratePage* ui;
@@ -29,6 +35,7 @@ private:
   QByteArray buffer;
   int expectedSize = -1;
   void readFrame();
+  int clickCount = 0;
 };
 
 #endif // CALIBRATEPAGE_H

@@ -49,8 +49,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
   setCentralWidget(widgetStack);
 
   // 각 페이지에서 버튼 클릭 시 다음 페이지로 이동할 수 있도록 설정
-  connect(startPage, &StartPage::nextClicked, this, &MainWindow::showCamSetPage);
-  connect(camSetPage, &CamSetPage::nextClicked, this, &MainWindow::showCalibratePage);
+  connect(startPage, &StartPage::moveToNext, this, &MainWindow::showCamSetPage);
+  connect(camSetPage, &CamSetPage::moveToNext, this, &MainWindow::showCalibratePage);
 }
 
 MainWindow::~MainWindow() {
@@ -60,11 +60,11 @@ MainWindow::~MainWindow() {
 
 void MainWindow::showCamSetPage() {
   widgetStack->setCurrentWidget(camSetPage);
-  camSetPage->activated();
+  camSetPage->activate();
 }
 
 void MainWindow::showCalibratePage() {
   widgetStack->setCurrentWidget(calibratePage);
-  camSetPage->deactivated();
-  calibratePage->activated();
+  camSetPage->deactivate();
+  calibratePage->activate();
 }

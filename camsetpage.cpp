@@ -6,19 +6,19 @@
 
 CamSetPage::CamSetPage(QWidget* parent, QLocalSocket* socket) : QWidget(parent), socket(socket), ui(new Ui::CamSetPage) {
   ui->setupUi(this);
-  connect(ui->nextButton, &QPushButton::clicked, this, &CamSetPage::nextClicked);
+  connect(ui->nextButton, &QPushButton::clicked, this, &CamSetPage::moveToNext);
 }
 
 CamSetPage::~CamSetPage() {
   delete ui;
 }
 
-void CamSetPage::activated() {
+void CamSetPage::activate() {
   sendCommand("camset", socket);
   connect(socket, &QLocalSocket::readyRead, this, &CamSetPage::readFrame);
 }
 
-void CamSetPage::deactivated() {
+void CamSetPage::deactivate() {
   sendCommand("stop", socket);
   disconnect(socket, &QLocalSocket::readyRead, this, &CamSetPage::readFrame);
 }
@@ -34,7 +34,7 @@ void CamSetPage::readFrame() {
 
       // type이 VIDEO 가 아닌 경우 종료
       if (cmd != VIDEO) {
-        qWarning("Undefined situation: received unknown command (%d)", cmd);
+        qWarning("[Client] Undefined situation");
         return;
       }
 

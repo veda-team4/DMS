@@ -19,57 +19,90 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <widget class="QLabel" name="infoLabel">
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Calibrate opened eye size. Please open your eyes.</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QLabel" name="infoLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>360</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>360</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>NanumGothic</family>
+         <pointsize>12</pointsize>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>뜬 눈의 크기를 측정합니다.</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="videoLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>360</width>
+         <height>270</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>360</width>
+         <height>270</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
-    <widget class="QLabel" name="videoLabel">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item alignment="Qt::AlignHCenter">
-    <widget class="QPushButton" name="pushButton">
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Click to next</string>
-     </property>
-    </widget>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item alignment="Qt::AlignHCenter">
+      <widget class="QPushButton" name="nextButton">
+       <property name="maximumSize">
+        <size>
+         <width>100</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Click to next</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
