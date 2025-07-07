@@ -20,7 +20,7 @@ void MonitorPage::activate() {
 
 void MonitorPage::deactivate() {
   sendCommand("stop", socket);
-  connect(socket, &QLocalSocket::readyRead, this, &MonitorPage::readFrame);
+  disconnect(socket, &QLocalSocket::readyRead, this, &MonitorPage::readFrame);
 }
 
 void MonitorPage::readFrame() {

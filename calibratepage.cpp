@@ -32,11 +32,17 @@ CalibratePage::~CalibratePage() {
 void CalibratePage::activate() {
   sendCommand("calibrate", socket);
   connect(socket, &QLocalSocket::readyRead, this, &CalibratePage::readFrame);
+  clickCount = 0;
+  progressStep = 0;
+  ui->infoLabel->setText("뜬 눈의 크기를 측정합니다. 준비 완료 시 버튼을 눌러주세요.");
 }
 
 void CalibratePage::deactivate() {
   sendCommand("stop", socket);
   disconnect(socket, &QLocalSocket::readyRead, this, &CalibratePage::readFrame);
+  clickCount = 0;
+  progressStep = 0;
+  ui->infoLabel->setText("뜬 눈의 크기를 측정합니다. 준비 완료 시 버튼을 눌러주세요.");
 }
 
 void CalibratePage::moveToNextStep() {
