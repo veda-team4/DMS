@@ -6,10 +6,10 @@
 #define BLINK_RATIO_THRESH 0.6 // 눈 감은 비율 임계값
 #define BLINK_WINDOW_MS 2000 // 분석 시간 윈도우 (2초)
 
-#define INCREASE_THRESH = 2.0 // 고개 움직임 감지 최소 값
-#define INCREASE_THRESH2 = 0.1 // 고개 움직임 미감지 최대 값 (이 값보다 적게 아래로 내려가면 떨어짐 아님)
-#define INCREASE_TIME = 0.3 // 고개 움직임 감지 최대 시간 값
-#define MAX_DOWN_COUNT = 5 // 몇번 카운트 해야 경고할 것인지
+#define INCREASE_THRESH  2.0 // 고개 움직임 감지 최소 값
+#define INCREASE_THRESH2 0.1 // 고개 움직임 미감지 최대 값 (이 값보다 적게 아래로 내려가면 떨어짐 아님)
+#define INCREASE_TIME 0.3 // 고개 움직임 감지 최대 시간 값
+#define MAX_DOWN_COUNT 5 // 몇번 카운트 해야 경고할 것인지
 // --------------------------------------------------------
 
 // ---------------------- 전역 변수 ----------------------
