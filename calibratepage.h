@@ -35,6 +35,7 @@ private:
   QByteArray buffer;
   QTimer* finishTimer;
   int expectedSize = -1;
+  quint8 cmd;
   void readFrame();
   int clickCount = 0;
   int progressStep = 0;

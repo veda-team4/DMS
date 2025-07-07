@@ -8,6 +8,8 @@
 
 void sendCommand(std::string cmd, QLocalSocket* socket);
 
+int readNBytes(QLocalSocket* socket, void* buf, int len);
+
 void writeLog(std::string log);
 
 #endif // UTILS_H

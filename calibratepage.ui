@@ -102,6 +102,60 @@
        </property>
       </widget>
      </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QLabel" name="openedInfoLabel">
+         <property name="text">
+          <string>Opened EAR</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="openedVal">
+         <property name="text">
+          <string>0.0</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QLabel" name="closedLabel">
+         <property name="text">
+          <string>Closed EAR</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="closedVal">
+         <property name="text">
+          <string>0.0</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QLabel" name="thresholdLabel">
+         <property name="text">
+          <string>EAR Threshold</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="thresholdVal">
+         <property name="text">
+          <string>0.0</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
      <item alignment="Qt::AlignHCenter">
       <widget class="QPushButton" name="nextButton">
        <property name="sizePolicy">

@@ -1,3 +1,4 @@
+#include <QString>
 #include "calibratepage.h"
 #include "ui_calibratepage.h"
 #include "utils.h"
@@ -38,6 +39,9 @@ void CalibratePage::deactivate() {
 }
 
 void CalibratePage::moveToNextStep() {
+  uint8_t type;
+  uint32_t dataLen;
+  double ear;
   switch (clickCount) {
   case 0:
     sendCommand("opened", socket);
@@ -60,8 +64,8 @@ void CalibratePage::moveToNextStep() {
     finishTimer->start();
     break;
   case 3:
-    ui->infoLabel->setText("눈 크기 측정 완료. 시작하려면 버튼을 눌러주세요.");
     sendCommand("finish", socket);
+    ui->infoLabel->setText("눈 크기 측정 완료. 시작하려면 버튼을 눌러주세요.");
     break;
   case 4:
     emit moveToNext();
@@ -70,21 +74,14 @@ void CalibratePage::moveToNextStep() {
   ++clickCount;
 }
 
-void CalibratePage::readFrame()
-{
+void CalibratePage::readFrame() {
   buffer.append(socket->readAll());
 
   while (true) {
     // 아직 명령과 길이까지 못 받았으면 대기
     if (expectedSize == -1 && buffer.size() >= 5) {
       // 1바이트 명령 코드 읽기
-      quint8 cmd = static_cast<quint8>(buffer[0]);
-
-      // type이 VIDEO 가 아닌 경우 종료
-      if (cmd != VIDEO) {
-        qWarning("[Client] Undefined situation");
-        return;
-      }
+      cmd = static_cast<quint8>(buffer[0]);
 
       // 4바이트 길이 읽기
       expectedSize = *reinterpret_cast<const quint32*>(buffer.constData() + 1);
@@ -95,15 +92,37 @@ void CalibratePage::readFrame()
 
     // 데이터 길이만큼 수신 완료되었을 때 처리
     if (expectedSize != -1 && buffer.size() >= expectedSize) {
-      QByteArray imageData = buffer.left(expectedSize);
-      buffer.remove(0, expectedSize);
-      expectedSize = -1;
+      if (cmd == VIDEO) {
+        QByteArray imageData = buffer.left(expectedSize);
+        buffer.remove(0, expectedSize);
+        expectedSize = -1;
 
-      QPixmap pixmap;
-      if (pixmap.loadFromData(imageData, "JPG")) {
-        ui->videoLabel->setPixmap(
-          pixmap.scaled(ui->videoLabel->size(), Qt::KeepAspectRatio)
-        );
+        QPixmap pixmap;
+        if (pixmap.loadFromData(imageData, "JPG")) {
+          ui->videoLabel->setPixmap(
+            pixmap.scaled(ui->videoLabel->size(), Qt::KeepAspectRatio)
+          );
+        }
+      }
+      else if (cmd == OPENEDEAR || cmd == CLOSEDEAR || cmd == EARTHRESHOLD) {
+        QByteArray data = buffer.left(expectedSize);
+        buffer.remove(0, expectedSize);
+        expectedSize = -1;
+
+        double value = *reinterpret_cast<const double*>(data.constData());
+        if (cmd == OPENEDEAR) {
+          ui->openedVal->setText(QString::number(value));
+        }
+        else if (cmd == CLOSEDEAR) {
+          ui->closedVal->setText(QString::number(value));
+        }
+        else if (cmd == EARTHRESHOLD) {
+          ui->thresholdVal->setText(QString::number(value));
+        }
+        else {
+          writeLog("Undefined situation");
+          exit(1);
+        }
       }
     }
     else {
