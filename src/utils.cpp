@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 
 #include "utils.h"
+#include "protocols.h"
 
 // 파일 디스크립터로부터 주어진 길이의 바이트만큼 읽어 버퍼에 저장해주는 함수
 int readNBytes(int fd, void* buf, int len) {
@@ -58,6 +59,25 @@ int writeNBytes(int fd, const void* buf, int len) {
   }
 
   return totalWritten == len ? totalWritten : -1;
+}
+
+// 주어진 프레임 써주는 함수
+int writeFrame(int fd, const std::vector<uchar>& buf) {
+  uint8_t protocol = FRAME;
+  uint32_t len = buf.size();
+  if (writeNBytes(fd, &protocol, 1) == -1) return -1;
+  if (writeNBytes(fd, &len, 4) == -1) return -1;
+  if (writeNBytes(fd, buf.data(), len) == -1) return -1;
+  return 0;
+}
+
+// 주어진 프로토콜과 데이터(double) 써주는 함수
+int writeData(int fd, uint8_t protocol, double data) {
+  uint32_t len = sizeof(data);
+  if (writeNBytes(fd, &protocol, 1) == -1) return -1;
+  if (writeNBytes(fd, &len, 4) == -1) return -1;
+  if (writeNBytes(fd, &data, len) == -1) return -1;
+  return 0;
 }
 
 double computeEAR(const dlib::full_object_detection& s, int idx) {

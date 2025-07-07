@@ -64,12 +64,9 @@ int camsetpage() {
     // 클라이언트에 프레임 전송하기
     std::vector<uchar> buf;
     cv::imencode(".jpg", frame, buf);
-    uint32_t size = buf.size();
-    uint8_t protocol = VIDEO;
-
-    if (writeNBytes(client_fd, &protocol, 1) == -1) return -1;
-    if (writeNBytes(client_fd, &size, 4) == -1) return -1;
-    if (writeNBytes(client_fd, buf.data(), size) == -1) return -1;
+    if (writeFrame(client_fd, buf) == -1) {
+      return -1;
+    }
   }
 
   return 0;
