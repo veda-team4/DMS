@@ -10,11 +10,11 @@
 이후 4바이트는 Data의 byte 크기를
 이후에는 Data가 전송된다
 
-types.h 에는 첫 1바이트에 해당하는 Type 을 정의한다
+protocols.h 에는 첫 1바이트에 해당하는 Type 을 정의한다
 */
 
 #define COMMAND 0
-#define VIDEO 1
+#define FRAME 1
 #define OPENEDEAR 2
 #define CLOSEDEAR 3
 #define EARTHRESHOLD 4

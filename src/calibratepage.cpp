@@ -38,10 +38,7 @@ int calibratepage(double& thresholdEAR) {
 
           // 클라이언트에 EAR threshold 값 전송하기
           uint8_t protocol = EARTHRESHOLD;
-          uint32_t size = sizeof(thresholdEAR);
-          if (writeNBytes(client_fd, &protocol, 1) == -1) return -1;
-          if (writeNBytes(client_fd, &size, 4) == -1) return -1;
-          if (writeNBytes(client_fd, &thresholdEAR, 8) == -1) return -1;
+          if (writeData(client_fd, protocol, thresholdEAR) == -1) return -1;
 
           writeLog(std::string("Opened: " + std::to_string(openedEAR)));
           writeLog(std::string("Closed: " + std::to_string(closedEAR)));
@@ -103,12 +100,9 @@ int calibratepage(double& thresholdEAR) {
     // 클라이언트에 프레임 전송하기
     std::vector<uchar> buf;
     cv::imencode(".jpg", frame, buf);
-    uint32_t size = buf.size();
-    uint8_t protocol = VIDEO;
-
-    if (writeNBytes(client_fd, &protocol, 1) == -1) return -1;
-    if (writeNBytes(client_fd, &size, 4) == -1) return -1;
-    if (writeNBytes(client_fd, buf.data(), size) == -1) return -1;
+    if (writeFrame(client_fd, buf) == -1) {
+      return -1;
+    }
   }
 
   return 0;
@@ -188,13 +182,9 @@ int calibrateEyes(double& ear, bool opened) {
     // 클라이언트에 프레임 전송하기
     std::vector<uchar> buf;
     cv::imencode(".jpg", frame, buf);
-
-    uint32_t size = buf.size();
-    uint8_t protocol = VIDEO;
-
-    if (writeNBytes(client_fd, &protocol, 1) == -1) return -1;
-    if (writeNBytes(client_fd, &size, 4) == -1) return -1;
-    if (writeNBytes(client_fd, buf.data(), size) == -1) return -1;
+    if (writeFrame(client_fd, buf) == -1) {
+      return -1;
+    }
   }
 
   ear = earSum / earCount;
@@ -202,9 +192,7 @@ int calibrateEyes(double& ear, bool opened) {
   // 클라이언트에 EAR 값 전송하기
   uint8_t protocol = (opened ? OPENEDEAR : CLOSEDEAR);
   uint32_t size = sizeof(ear);
-  if (writeNBytes(client_fd, &protocol, 1) == -1) return -1;
-  if (writeNBytes(client_fd, &size, 4) == -1) return -1;
-  if (writeNBytes(client_fd, &ear, 8) == -1) return -1;
+  if (writeData(client_fd, protocol, ear) == -1) return -1;
 
   return 0;
 }
