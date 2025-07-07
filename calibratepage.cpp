@@ -53,6 +53,8 @@ void CalibratePage::moveToNextStep() {
   switch (clickCount) {
   case 0:
     sendCommand("opened", socket);
+    ui->nextButton->setEnabled(false);
+    ui->previousButton->setEnabled(false);
     ui->infoLabel->setText("뜬 눈 크기 측정중.");
     progressStep = 0;
     ui->progressBar->setValue(0);
@@ -60,10 +62,14 @@ void CalibratePage::moveToNextStep() {
     break;
   case 1:
     sendCommand("finish", socket);
+    ui->nextButton->setEnabled(true);
+    ui->previousButton->setEnabled(true);
     ui->infoLabel->setText("감은 눈의 크기를 측정합니다. 준비 완료 시 버튼을 눌러주세요.");
     break;
   case 2:
     sendCommand("closed", socket);
+    ui->nextButton->setEnabled(false);
+    ui->previousButton->setEnabled(false);
     ui->infoLabel->setText("감은 눈 크기 측정중.");
     progressStep = 0;
     ui->progressBar->setValue(0);
@@ -71,6 +77,8 @@ void CalibratePage::moveToNextStep() {
     break;
   case 3:
     sendCommand("finish", socket);
+    ui->nextButton->setEnabled(true);
+    ui->previousButton->setEnabled(true);
     ui->infoLabel->setText("눈 크기 측정 완료. 시작하려면 버튼을 눌러주세요.");
     break;
   case 4:
