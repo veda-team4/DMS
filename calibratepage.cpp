@@ -161,6 +161,11 @@ void CalibratePage::readFrame() {
           exit(1);
         }
       }
+      else {
+        writeLog("Clear protocol number " + std::to_string(cmd));
+        buffer.remove(0, expectedSize);
+        expectedSize = -1;
+      }
     }
     else {
       break;  // 아직 데이터 부족
