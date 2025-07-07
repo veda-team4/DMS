@@ -1,6 +1,7 @@
 #include <iostream>
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include "utils.h"
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
   ui->setupUi(this);
@@ -20,19 +21,28 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
   serverProcess->start(QString(SERVER_PATH) + QString("/camera_server"), QStringList());
 
   // 서버 프로세스 실행 기다림
-  if (!serverProcess->waitForStarted()) {
-    qDebug() << "Failed to start server";
+  if (!serverProcess->waitForStarted(50000)) {
+    writeLog("Failed to start server");
   }
 
-  // TODO 소켓 연결 될 때까지 sleep 하도록 변경하기
-  QThread::sleep(2); // 서버 프로세스에서의 소켓 생성 시간을 고려하여 2초간 sleep
-
-  // 서버 소켓과 연결
-  socket->connectToServer(SOCKET_PATH);
+  // 서버 소켓과 연결 (10초 동안 연결 시도)
+  constexpr int MAX_RETRY_MS = 10000;
+  constexpr int INTERVAL_MS = 1000;
+  int elapsed = 0;
+  while (elapsed < MAX_RETRY_MS) {
+    socket->connectToServer(SOCKET_PATH);
+    if (socket->state() == QLocalSocket::ConnectedState) {
+      writeLog("Server connected.");
+      break;
+    }
+    socket->abort();  // 실패한 연결 정리
+    QThread::msleep(INTERVAL_MS);
+    elapsed += INTERVAL_MS;
+  }
 
   // 소켓 연결 실패 시 오류 처리
   if (socket->state() != QLocalSocket::ConnectedState) {
-    qDebug() << "Socket connection error: " << socket->errorString();
+    writeLog(std::string("Socket connection error: ") + socket->errorString().toStdString());
   }
 
   // 페이지 생성
