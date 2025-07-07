@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CalibratePage</class>
- <widget class="QWidget" name="CalibratePage">
+ <class>MonitorPage</class>
+ <widget class="QWidget" name="MonitorPage">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -50,7 +50,7 @@
         </font>
        </property>
        <property name="text">
-        <string>뜬 눈의 크기를 측정합니다. 준비 완료 시 버튼을 눌러주세요.</string>
+        <string>Monitoring</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -89,18 +89,57 @@
    </item>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item alignment="Qt::AlignHCenter">
-      <widget class="QProgressBar" name="progressBar">
-       <property name="maximumSize">
-        <size>
-         <width>90</width>
-         <height>16777215</height>
-        </size>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <property name="spacing">
+        <number>6</number>
        </property>
-       <property name="value">
-        <number>24</number>
+       <property name="bottomMargin">
+        <number>0</number>
        </property>
-      </widget>
+       <item>
+        <widget class="QProgressBar" name="progressBar">
+         <property name="maximumSize">
+          <size>
+           <width>90</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="value">
+          <number>24</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Sleeping rate</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </item>
      <item alignment="Qt::AlignHCenter">
       <widget class="QPushButton" name="nextButton">

@@ -23,6 +23,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
   if (!serverProcess->waitForStarted()) {
     qDebug() << "Failed to start server";
   }
+
+  // TODO 소켓 연결 될 때까지 sleep 하도록 변경하기
   QThread::sleep(2); // 서버 프로세스에서의 소켓 생성 시간을 고려하여 2초간 sleep
 
   // 서버 소켓과 연결
@@ -37,12 +39,14 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
   startPage = new StartPage;
   camSetPage = new CamSetPage(nullptr, socket);
   calibratePage = new CalibratePage(nullptr, socket);
+  monitorPage = new MonitorPage(nullptr, socket);
 
   // 페이지 스택에 추가
   widgetStack = new QStackedWidget(this);
   widgetStack->addWidget(startPage);
   widgetStack->addWidget(camSetPage);
   widgetStack->addWidget(calibratePage);
+  widgetStack->addWidget(monitorPage);
   widgetStack->setCurrentWidget(startPage);
 
   // 메인 윈도우의 중앙 위젯을 widgetStack 으로 설정
@@ -51,6 +55,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
   // 각 페이지에서 버튼 클릭 시 다음 페이지로 이동할 수 있도록 설정
   connect(startPage, &StartPage::moveToNext, this, &MainWindow::showCamSetPage);
   connect(camSetPage, &CamSetPage::moveToNext, this, &MainWindow::showCalibratePage);
+  connect(calibratePage, &CalibratePage::moveToNext, this, &MainWindow::showMonitorPage);
 }
 
 MainWindow::~MainWindow() {
@@ -74,6 +79,13 @@ void MainWindow::showCamSetPage() {
 
 void MainWindow::showCalibratePage() {
   widgetStack->setCurrentWidget(calibratePage);
+  // TODO camSetPage 가 아닌 현재 위젯을 deactivate 하도록.
   camSetPage->deactivate();
   calibratePage->activate();
+}
+
+void MainWindow::showMonitorPage() {
+  widgetStack->setCurrentWidget(monitorPage);
+  calibratePage->deactivate();
+  monitorPage->activate();
 }

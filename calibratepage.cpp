@@ -60,7 +60,10 @@ void CalibratePage::moveToNextStep() {
     finishTimer->start();
     break;
   case 3:
+    ui->infoLabel->setText("눈 크기 측정 완료. 시작하려면 버튼을 눌러주세요.");
     sendCommand("finish", socket);
+    break;
+  case 4:
     emit moveToNext();
     break;
   }
