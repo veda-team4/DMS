@@ -4,20 +4,21 @@
 #include <QWidget>
 #include <QLocalSocket>
 #include <QByteArray>
+#include "basepage.h"
 
 namespace Ui {
   class MonitorPage;
 }
 
-class MonitorPage : public QWidget {
+class MonitorPage : public BasePage {
   Q_OBJECT
 
 public:
   explicit MonitorPage(QWidget* parent, QLocalSocket* socket);
   ~MonitorPage();
 
-  void activate();
-  void deactivate();
+  void activate() override;
+  void deactivate() override;
 
 private:
   Ui::MonitorPage* ui;

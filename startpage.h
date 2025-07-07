@@ -2,21 +2,20 @@
 #define STARTPAGE_H
 
 #include <QWidget>
+#include "basepage.h"
 
 namespace Ui {
-    class StartPage;
+  class StartPage;
 }
 
-class StartPage : public QWidget {
-    Q_OBJECT
+class StartPage : public BasePage {
+  Q_OBJECT
 public:
-    explicit StartPage(QWidget* parent = nullptr);
-    ~StartPage();
-signals:
-    void moveToNext();
+  explicit StartPage(QWidget* parent);
+  ~StartPage();
 
 private:
-    Ui::StartPage* ui;
+  Ui::StartPage* ui;
 };
 
 #endif // STARTPAGE_H

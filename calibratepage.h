@@ -8,26 +8,24 @@
 #include <QProcess>
 #include <QThread>
 #include <QTimer>
+#include "basepage.h"
 
 namespace Ui {
   class CalibratePage;
 }
 
-class CalibratePage : public QWidget {
+class CalibratePage : public BasePage {
   Q_OBJECT
 
 public:
   explicit CalibratePage(QWidget* parent, QLocalSocket* socket);
   ~CalibratePage();
 
-  void activate();
-  void deactivate();
+  void activate() override;
+  void deactivate() override;
 
 private slots:
   void moveToNextStep();
-
-signals:
-  void moveToNext();
 
 private:
   Ui::CalibratePage* ui;

@@ -4,9 +4,10 @@
 #include "utils.h"
 #include "protocols.h"
 
-CamSetPage::CamSetPage(QWidget* parent, QLocalSocket* socket) : QWidget(parent), socket(socket), ui(new Ui::CamSetPage) {
+CamSetPage::CamSetPage(QWidget* parent, QLocalSocket* socket) : BasePage(parent), socket(socket), ui(new Ui::CamSetPage) {
   ui->setupUi(this);
   connect(ui->nextButton, &QPushButton::clicked, this, &CamSetPage::moveToNext);
+  connect(ui->previousButton, &QPushButton::clicked, this, &CamSetPage::moveToPrevious);
 }
 
 CamSetPage::~CamSetPage() {

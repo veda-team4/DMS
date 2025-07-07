@@ -4,10 +4,11 @@
 #include "utils.h"
 #include "protocols.h"
 
-CalibratePage::CalibratePage(QWidget* parent, QLocalSocket* socket) : QWidget(parent), socket(socket), ui(new Ui::CalibratePage) {
+CalibratePage::CalibratePage(QWidget* parent, QLocalSocket* socket) : BasePage(parent), socket(socket), ui(new Ui::CalibratePage) {
   ui->setupUi(this);
   ui->progressBar->setValue(0);
   connect(ui->nextButton, &QPushButton::clicked, this, &CalibratePage::moveToNextStep);
+  connect(ui->previousButton, &QPushButton::clicked, this, &CalibratePage::moveToPrevious);
 
   finishTimer = new QTimer(this);
   finishTimer->setInterval(100);

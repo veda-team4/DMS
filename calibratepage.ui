@@ -171,7 +171,20 @@
         </size>
        </property>
        <property name="text">
-        <string>Click to next</string>
+        <string>Next</string>
+       </property>
+      </widget>
+     </item>
+     <item alignment="Qt::AlignHCenter">
+      <widget class="QPushButton" name="previousButton">
+       <property name="maximumSize">
+        <size>
+         <width>80</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Previous</string>
        </property>
       </widget>
      </item>

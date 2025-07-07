@@ -142,7 +142,7 @@
       </layout>
      </item>
      <item alignment="Qt::AlignHCenter">
-      <widget class="QPushButton" name="nextButton">
+      <widget class="QPushButton" name="previousButton">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -156,7 +156,7 @@
         </size>
        </property>
        <property name="text">
-        <string>Click to next</string>
+        <string>Previous</string>
        </property>
       </widget>
      </item>

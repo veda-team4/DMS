@@ -4,24 +4,22 @@
 #include <QWidget>
 #include <QLocalSocket>
 #include <QBuffer>
+#include "basepage.h"
 
 namespace Ui {
   class CamSetPage;
 }
 
-class CamSetPage : public QWidget {
+class CamSetPage : public BasePage {
   Q_OBJECT
 
 public:
   explicit CamSetPage(QWidget* parent, QLocalSocket* socket);
   ~CamSetPage();
 
-signals:
-  void moveToNext();
-
 public:
-  void activate();
-  void deactivate();
+  void activate() override;
+  void deactivate() override;
 
 private:
   Ui::CamSetPage* ui;

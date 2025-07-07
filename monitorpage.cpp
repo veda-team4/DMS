@@ -3,8 +3,9 @@
 #include "utils.h"
 #include "protocols.h"
 
-MonitorPage::MonitorPage(QWidget* parent, QLocalSocket* socket) : QWidget(parent), ui(new Ui::MonitorPage), socket(socket) {
+MonitorPage::MonitorPage(QWidget* parent, QLocalSocket* socket) : BasePage(parent), ui(new Ui::MonitorPage), socket(socket) {
   ui->setupUi(this);
+  connect(ui->previousButton, &QPushButton::clicked, this, &MonitorPage::moveToPrevious);
 }
 
 MonitorPage::~MonitorPage()

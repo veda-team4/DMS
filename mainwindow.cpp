@@ -46,7 +46,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
   }
 
   // 페이지 생성
-  startPage = new StartPage;
+  startPage = new StartPage(nullptr);
   camSetPage = new CamSetPage(nullptr, socket);
   calibratePage = new CalibratePage(nullptr, socket);
   monitorPage = new MonitorPage(nullptr, socket);
@@ -62,10 +62,16 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
   // 메인 윈도우의 중앙 위젯을 widgetStack 으로 설정
   setCentralWidget(widgetStack);
 
-  // 각 페이지에서 버튼 클릭 시 다음 페이지로 이동할 수 있도록 설정
+  // 각 페이지에서 버튼 클릭 시 다음 또는 이전 페이지로 이동할 수 있도록 설정
   connect(startPage, &StartPage::moveToNext, this, &MainWindow::showCamSetPage);
+
   connect(camSetPage, &CamSetPage::moveToNext, this, &MainWindow::showCalibratePage);
+  connect(camSetPage, &CamSetPage::moveToPrevious, this, &MainWindow::showStartPage);
+
   connect(calibratePage, &CalibratePage::moveToNext, this, &MainWindow::showMonitorPage);
+  connect(calibratePage, &CalibratePage::moveToPrevious, this, &MainWindow::showCamSetPage);
+
+  connect(monitorPage, &MonitorPage::moveToPrevious, this, &MainWindow::showCalibratePage);
 }
 
 MainWindow::~MainWindow() {
@@ -82,20 +88,33 @@ MainWindow::~MainWindow() {
   }
 }
 
+void MainWindow::showStartPage() {
+  if (auto prev = qobject_cast<BasePage*>(widgetStack->currentWidget())) {
+    prev->deactivate();
+  }
+  widgetStack->setCurrentWidget(startPage);
+}
+
 void MainWindow::showCamSetPage() {
+  if (auto prev = qobject_cast<BasePage*>(widgetStack->currentWidget())) {
+    prev->deactivate();
+  }
   widgetStack->setCurrentWidget(camSetPage);
   camSetPage->activate();
 }
 
 void MainWindow::showCalibratePage() {
+  if (auto prev = qobject_cast<BasePage*>(widgetStack->currentWidget())) {
+    prev->deactivate();
+  }
   widgetStack->setCurrentWidget(calibratePage);
-  // TODO camSetPage 가 아닌 현재 위젯을 deactivate 하도록.
-  camSetPage->deactivate();
   calibratePage->activate();
 }
 
 void MainWindow::showMonitorPage() {
+  if (auto prev = qobject_cast<BasePage*>(widgetStack->currentWidget())) {
+    prev->deactivate();
+  }
   widgetStack->setCurrentWidget(monitorPage);
-  calibratePage->deactivate();
   monitorPage->activate();
 }

@@ -9,6 +9,7 @@
 #include "camsetpage.h"
 #include "calibratepage.h"
 #include "monitorpage.h"
+#include "basepage.h"
 
 #define SERVER_PATH "/home/jinhyeok/camera_server/build"
 #define SOCKET_PATH "/home/jinhyeok/camera_server/build/.face_socket"
@@ -25,16 +26,17 @@ public:
   ~MainWindow();
 
 private slots:
+  void showStartPage();
   void showCamSetPage();
   void showCalibratePage();
   void showMonitorPage();
 
 private:
   QStackedWidget* widgetStack;
-  StartPage* startPage;
-  CamSetPage* camSetPage;
-  CalibratePage* calibratePage;
-  MonitorPage* monitorPage;
+  BasePage* startPage;
+  BasePage* camSetPage;
+  BasePage* calibratePage;
+  BasePage* monitorPage;
   Ui::MainWindow* ui;
 
   QProcess* serverProcess;

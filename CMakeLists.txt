@@ -15,6 +15,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Network)
 
 set(PROJECT_SOURCES
         main.cpp
+        basepage.cpp basepage.h
         mainwindow.cpp mainwindow.h mainwindow.ui
         startpage.cpp startpage.h startpage.ui
         camsetpage.cpp camsetpage.h camsetpage.ui
