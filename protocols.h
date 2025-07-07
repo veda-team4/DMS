@@ -18,5 +18,6 @@ types.h 에는 첫 1바이트에 해당하는 Type 을 정의한다
 #define OPENEDEAR 2
 #define CLOSEDEAR 3
 #define EARTHRESHOLD 4
+#define EYECLOSEDRATIO 5
 
 #endif // PROTOCOLS_H

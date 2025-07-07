@@ -25,6 +25,7 @@ private:
   QLocalSocket* socket;
   QByteArray buffer;
   int expectedSize = -1;
+  quint8 cmd;
   void readFrame();
 };
 
