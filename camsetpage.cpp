@@ -33,8 +33,8 @@ void CamSetPage::readFrame() {
       // 1바이트 명령 코드 읽기
       cmd = static_cast<quint8>(buffer[0]);
 
-      // type이 VIDEO 가 아닌 경우 종료
-      if (cmd != VIDEO) {
+      // type이 FRAME 가 아닌 경우 종료
+      if (cmd != FRAME) {
         qWarning("[Client] Undefined situation");
         return;
       }
@@ -48,7 +48,7 @@ void CamSetPage::readFrame() {
 
     // 데이터 길이만큼 수신 완료되었을 때 처리
     if (expectedSize != -1 && buffer.size() >= expectedSize) {
-      if (cmd == VIDEO) {
+      if (cmd == FRAME) {
         QByteArray imageData = buffer.left(expectedSize);
         buffer.remove(0, expectedSize);
         expectedSize = -1;

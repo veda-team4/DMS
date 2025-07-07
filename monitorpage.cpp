@@ -41,7 +41,7 @@ void MonitorPage::readFrame() {
 
     // 데이터 길이만큼 수신 완료되었을 때 처리
     if (expectedSize != -1 && buffer.size() >= expectedSize) {
-      if (cmd == VIDEO) {
+      if (cmd == FRAME) {
         QByteArray imageData = buffer.left(expectedSize);
         buffer.remove(0, expectedSize);
         expectedSize = -1;
