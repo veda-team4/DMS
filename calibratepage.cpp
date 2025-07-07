@@ -8,7 +8,7 @@ CalibratePage::CalibratePage(QWidget* parent, QLocalSocket* socket) : BasePage(p
   ui->setupUi(this);
   ui->progressBar->setValue(0);
   connect(ui->nextButton, &QPushButton::clicked, this, &CalibratePage::moveToNextStep);
-  connect(ui->previousButton, &QPushButton::clicked, this, &CalibratePage::moveToPrevious);
+  connect(ui->previousButton, &QPushButton::clicked, this, &CalibratePage::moveToPreviousStep);
 
   finishTimer = new QTimer(this);
   finishTimer->setInterval(100);
@@ -35,14 +35,15 @@ void CalibratePage::activate() {
   clickCount = 0;
   progressStep = 0;
   ui->infoLabel->setText("뜬 눈의 크기를 측정합니다. 준비 완료 시 버튼을 눌러주세요.");
+  ui->progressBar->setValue(0);
+  ui->openedVal->setText("0.0");
+  ui->closedVal->setText("0.0");
+  ui->thresholdVal->setText("0.0");
 }
 
 void CalibratePage::deactivate() {
   sendCommand("stop", socket);
   disconnect(socket, &QLocalSocket::readyRead, this, &CalibratePage::readFrame);
-  clickCount = 0;
-  progressStep = 0;
-  ui->infoLabel->setText("뜬 눈의 크기를 측정합니다. 준비 완료 시 버튼을 눌러주세요.");
 }
 
 void CalibratePage::moveToNextStep() {
@@ -54,7 +55,6 @@ void CalibratePage::moveToNextStep() {
     sendCommand("opened", socket);
     ui->infoLabel->setText("뜬 눈 크기 측정중.");
     progressStep = 0;
-    ui->progressBar->setRange(0, 100);
     ui->progressBar->setValue(0);
     finishTimer->start();
     break;
@@ -66,7 +66,6 @@ void CalibratePage::moveToNextStep() {
     sendCommand("closed", socket);
     ui->infoLabel->setText("감은 눈 크기 측정중.");
     progressStep = 0;
-    ui->progressBar->setRange(0, 100);
     ui->progressBar->setValue(0);
     finishTimer->start();
     break;
@@ -79,6 +78,29 @@ void CalibratePage::moveToNextStep() {
     break;
   }
   ++clickCount;
+}
+
+void CalibratePage::moveToPreviousStep() {
+  switch (clickCount) {
+  case 0:
+    emit moveToPrevious();
+    break;
+  case 2:
+    ui->infoLabel->setText("뜬 눈의 크기를 측정합니다. 준비 완료 시 버튼을 눌러주세요.");
+    ui->progressBar->setValue(0);
+    ui->openedVal->setText("0.0");
+    progressStep = 0;
+    clickCount -= 2;
+    break;
+  case 4:
+    ui->infoLabel->setText("감은 눈의 크기를 측정합니다. 준비 완료 시 버튼을 눌러주세요.");
+    ui->progressBar->setValue(0);
+    ui->closedVal->setText("0.0");
+    ui->thresholdVal->setText("0.0");
+    progressStep = 0;
+    clickCount -= 2;
+    break;
+  }
 }
 
 void CalibratePage::readFrame() {

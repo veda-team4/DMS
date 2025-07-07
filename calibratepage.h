@@ -26,6 +26,7 @@ public:
 
 private slots:
   void moveToNextStep();
+  void moveToPreviousStep();
 
 private:
   Ui::CalibratePage* ui;
