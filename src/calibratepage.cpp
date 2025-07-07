@@ -11,7 +11,7 @@
 #include "protocols.h"
 #include "utils.h"
 
-int calibrateEyes(double& ear);
+int calibrateEyes(double& ear, bool opened);
 
 int calibratepage(double& thresholdEAR) {
   // 뜬 눈 EAR, 감은 눈 EAR
@@ -28,16 +28,26 @@ int calibratepage(double& thresholdEAR) {
         std::cout << "[Server] message from client: " << buf << std::endl;
         // 클라이언트 측으로부터 msg 수신 시 while 문 빠져나감
         if (strcmp(buf, "opened") == 0) {
-          calibrateEyes(openedEAR);
+          calibrateEyes(openedEAR, true);
         }
         else if (strcmp(buf, "closed") == 0) {
-          calibrateEyes(closedEAR);
-        }
-        else if (strcmp(buf, "stop") == 0) {
+          calibrateEyes(closedEAR, false);
+
+          // EAR threshold 값 계산
           thresholdEAR = closedEAR + (openedEAR - closedEAR) * EAR_THRESH_VAL;
+
+          // 클라이언트에 EAR threshold 값 전송하기
+          uint8_t protocol = EARTHRESHOLD;
+          uint32_t size = sizeof(thresholdEAR);
+          if (writeNBytes(client_fd, &protocol, 1) == -1) return -1;
+          if (writeNBytes(client_fd, &size, 4) == -1) return -1;
+          if (writeNBytes(client_fd, &thresholdEAR, 8) == -1) return -1;
+
           writeLog(std::string("Opened: " + std::to_string(openedEAR)));
           writeLog(std::string("Closed: " + std::to_string(closedEAR)));
           writeLog(std::string("Threshold: ") + std::to_string(thresholdEAR));
+        }
+        else if (strcmp(buf, "stop") == 0) {
           return 0;
         }
         else {
@@ -104,7 +114,7 @@ int calibratepage(double& thresholdEAR) {
   return 0;
 }
 
-int calibrateEyes(double& ear) {
+int calibrateEyes(double& ear, bool opened) {
   double earSum = 0.0;
   int earCount = 0;
 
@@ -178,6 +188,7 @@ int calibrateEyes(double& ear) {
     // 클라이언트에 프레임 전송하기
     std::vector<uchar> buf;
     cv::imencode(".jpg", frame, buf);
+
     uint32_t size = buf.size();
     uint8_t protocol = VIDEO;
 
@@ -187,6 +198,13 @@ int calibrateEyes(double& ear) {
   }
 
   ear = earSum / earCount;
+
+  // 클라이언트에 EAR 값 전송하기
+  uint8_t protocol = (opened ? OPENEDEAR : CLOSEDEAR);
+  uint32_t size = sizeof(ear);
+  if (writeNBytes(client_fd, &protocol, 1) == -1) return -1;
+  if (writeNBytes(client_fd, &size, 4) == -1) return -1;
+  if (writeNBytes(client_fd, &ear, 8) == -1) return -1;
 
   return 0;
 }
