@@ -117,6 +117,9 @@ int monitorpage(double thresholdEAR) {
       auto now = std::chrono::steady_clock::now();
       blinkHistory.emplace_back(now, isClosed);
     }
+    else {
+      blinkHistory.emplace_back(std::chrono::steady_clock::now(), false);
+    }
 
     // 2초간의 윈도우 초과한 항목 제거
     while (!blinkHistory.empty() && std::chrono::duration_cast<std::chrono::milliseconds>(blinkHistory.back().first - blinkHistory.front().first).count() > BLINK_WINDOW_MS) {
