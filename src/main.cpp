@@ -102,6 +102,12 @@ int main(void) {
           break;
         }
       }
+      else if (strcmp(buf, "monitor") == 0) {
+        if (monitorpage(thresholdEAR) == -1) {
+          writeLog("monitor error");
+          break;
+        }
+      }
       else if (strcmp(buf, "stop") == 0) {
         break;
       }

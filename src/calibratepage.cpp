@@ -11,43 +11,12 @@
 #include "protocols.h"
 #include "utils.h"
 
-int waitingPage(const char* msg);
 int calibrateEyes(double& ear);
 
 int calibratepage(double& thresholdEAR) {
   // 뜬 눈 EAR, 감은 눈 EAR
   double openedEAR, closedEAR;
 
-  // "opened" 수신 할 때까지 영상 전송
-  if (waitingPage("opened") == -1) {
-    return -1;
-  }
-
-  // 뜬 눈 EAR 계산
-  if (calibrateEyes(openedEAR) == -1) {
-    return -1;
-  }
-
-  // "closed" 수신 할 때까지 영상 전송
-  if (waitingPage("closed") == -1) {
-    return -1;
-  }
-
-  // 감은 눈 EAR 계산
-  if (calibrateEyes(closedEAR) == -1) {
-    return -1;
-  }
-
-  thresholdEAR = closedEAR + (openedEAR - closedEAR) * EAR_THRESH_VAL;
-
-  writeLog(std::string("Opened: " + std::to_string(openedEAR)));
-  writeLog(std::string("Closed: " + std::to_string(closedEAR)));
-  writeLog(std::string("Threshold: ") + std::to_string(thresholdEAR));
-  return 0;
-}
-
-int waitingPage(const char* msg) {
-  // 클라이언트 측으로부터 msg 수신할 때까지 프레임 전송
   while (true) {
     uint8_t type;
     if (recv(client_fd, &type, 1, MSG_DONTWAIT) == 1) {
@@ -58,8 +27,18 @@ int waitingPage(const char* msg) {
         readNBytes(client_fd, buf, dataLen);
         std::cout << "[Server] message from client: " << buf << std::endl;
         // 클라이언트 측으로부터 msg 수신 시 while 문 빠져나감
-        if (strcmp(buf, msg) == 0) {
-          break;
+        if (strcmp(buf, "opened") == 0) {
+          calibrateEyes(openedEAR);
+        }
+        else if (strcmp(buf, "closed") == 0) {
+          calibrateEyes(closedEAR);
+        }
+        else if (strcmp(buf, "stop") == 0) {
+          thresholdEAR = closedEAR + (openedEAR - closedEAR) * EAR_THRESH_VAL;
+          writeLog(std::string("Opened: " + std::to_string(openedEAR)));
+          writeLog(std::string("Closed: " + std::to_string(closedEAR)));
+          writeLog(std::string("Threshold: ") + std::to_string(thresholdEAR));
+          return 0;
         }
         else {
           return -1;
