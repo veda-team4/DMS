@@ -15,13 +15,16 @@ CamSetPage::~CamSetPage() {
 }
 
 void CamSetPage::activate() {
-  sendCommand("camset", socket);
   connect(socket, &QLocalSocket::readyRead, this, &CamSetPage::readFrame);
+  writeProtocol(socket, ProtocolType::CAMSET);
 }
 
 void CamSetPage::deactivate() {
-  sendCommand("stop", socket);
+  writeProtocol(socket, ProtocolType::STOP);
   disconnect(socket, &QLocalSocket::readyRead, this, &CamSetPage::readFrame);
+  while (socket->bytesAvailable() > 0) {
+    socket->readAll();
+  }
 }
 
 void CamSetPage::readFrame() {
@@ -33,12 +36,6 @@ void CamSetPage::readFrame() {
       // 1바이트 명령 코드 읽기
       cmd = static_cast<quint8>(buffer[0]);
 
-      // type이 FRAME 가 아닌 경우 종료
-      if (cmd != FRAME) {
-        qWarning("[Client] Undefined situation");
-        return;
-      }
-
       // 4바이트 길이 읽기
       expectedSize = *reinterpret_cast<const quint32*>(buffer.constData() + 1);
 
@@ -48,7 +45,7 @@ void CamSetPage::readFrame() {
 
     // 데이터 길이만큼 수신 완료되었을 때 처리
     if (expectedSize != -1 && buffer.size() >= expectedSize) {
-      if (cmd == FRAME) {
+      if (cmd == ProtocolType::FRAME) {
         QByteArray imageData = buffer.left(expectedSize);
         buffer.remove(0, expectedSize);
         expectedSize = -1;

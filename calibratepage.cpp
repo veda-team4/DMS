@@ -30,7 +30,7 @@ CalibratePage::~CalibratePage() {
 }
 
 void CalibratePage::activate() {
-  sendCommand("calibrate", socket);
+  writeProtocol(socket, ProtocolType::CALIBRATE);
   connect(socket, &QLocalSocket::readyRead, this, &CalibratePage::readFrame);
   clickCount = 0;
   progressStep = 0;
@@ -42,8 +42,11 @@ void CalibratePage::activate() {
 }
 
 void CalibratePage::deactivate() {
-  sendCommand("stop", socket);
+  writeProtocol(socket, ProtocolType::STOP);
   disconnect(socket, &QLocalSocket::readyRead, this, &CalibratePage::readFrame);
+  while (socket->bytesAvailable() > 0) {
+    socket->readAll();
+  }
 }
 
 void CalibratePage::moveToNextStep() {
@@ -52,7 +55,7 @@ void CalibratePage::moveToNextStep() {
   double ear;
   switch (clickCount) {
   case 0:
-    sendCommand("opened", socket);
+    writeProtocol(socket, ProtocolType::CALIBRATE_OPENED);
     ui->nextButton->setEnabled(false);
     ui->previousButton->setEnabled(false);
     ui->infoLabel->setText("뜬 눈 크기 측정중.");
@@ -61,13 +64,13 @@ void CalibratePage::moveToNextStep() {
     finishTimer->start();
     break;
   case 1:
-    sendCommand("finish", socket);
+    writeProtocol(socket, ProtocolType::CALIBRATE_FINISH);
     ui->nextButton->setEnabled(true);
     ui->previousButton->setEnabled(true);
     ui->infoLabel->setText("감은 눈의 크기를 측정합니다. 준비 완료 시 버튼을 눌러주세요.");
     break;
   case 2:
-    sendCommand("closed", socket);
+    writeProtocol(socket, ProtocolType::CALIBRATE_CLOSED);
     ui->nextButton->setEnabled(false);
     ui->previousButton->setEnabled(false);
     ui->infoLabel->setText("감은 눈 크기 측정중.");
@@ -76,7 +79,7 @@ void CalibratePage::moveToNextStep() {
     finishTimer->start();
     break;
   case 3:
-    sendCommand("finish", socket);
+    writeProtocol(socket, ProtocolType::CALIBRATE_FINISH);
     ui->nextButton->setEnabled(true);
     ui->previousButton->setEnabled(true);
     ui->infoLabel->setText("눈 크기 측정 완료. 시작하려면 버튼을 눌러주세요.");
@@ -129,7 +132,7 @@ void CalibratePage::readFrame() {
 
     // 데이터 길이만큼 수신 완료되었을 때 처리
     if (expectedSize != -1 && buffer.size() >= expectedSize) {
-      if (cmd == FRAME) {
+      if (cmd == ProtocolType::FRAME) {
         QByteArray imageData = buffer.left(expectedSize);
         buffer.remove(0, expectedSize);
         expectedSize = -1;
@@ -141,24 +144,20 @@ void CalibratePage::readFrame() {
           );
         }
       }
-      else if (cmd == OPENEDEAR || cmd == CLOSEDEAR || cmd == EARTHRESHOLD) {
+      else if (cmd == ProtocolType::OPENEDEAR || cmd == ProtocolType::CLOSEDEAR || cmd == ProtocolType::EARTHRESHOLD) {
         QByteArray data = buffer.left(expectedSize);
         buffer.remove(0, expectedSize);
         expectedSize = -1;
 
         double value = *reinterpret_cast<const double*>(data.constData());
-        if (cmd == OPENEDEAR) {
+        if (cmd == ProtocolType::OPENEDEAR) {
           ui->openedVal->setText(QString::number(value));
         }
-        else if (cmd == CLOSEDEAR) {
+        else if (cmd == ProtocolType::CLOSEDEAR) {
           ui->closedVal->setText(QString::number(value));
         }
-        else if (cmd == EARTHRESHOLD) {
+        else if (cmd == ProtocolType::EARTHRESHOLD) {
           ui->thresholdVal->setText(QString::number(value));
-        }
-        else {
-          writeLog("Undefined situation");
-          exit(1);
         }
       }
       else {

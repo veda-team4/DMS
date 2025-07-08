@@ -14,13 +14,16 @@ MonitorPage::~MonitorPage()
 }
 
 void MonitorPage::activate() {
-  sendCommand("monitor", socket);
   connect(socket, &QLocalSocket::readyRead, this, &MonitorPage::readFrame);
+  writeProtocol(socket, ProtocolType::MONITOR);
 }
 
 void MonitorPage::deactivate() {
-  sendCommand("stop", socket);
+  writeProtocol(socket, ProtocolType::STOP);
   disconnect(socket, &QLocalSocket::readyRead, this, &MonitorPage::readFrame);
+  while (socket->bytesAvailable() > 0) {
+    socket->readAll();
+  }
 }
 
 void MonitorPage::readFrame() {
@@ -41,7 +44,7 @@ void MonitorPage::readFrame() {
 
     // 데이터 길이만큼 수신 완료되었을 때 처리
     if (expectedSize != -1 && buffer.size() >= expectedSize) {
-      if (cmd == FRAME) {
+      if (cmd == ProtocolType::FRAME) {
         QByteArray imageData = buffer.left(expectedSize);
         buffer.remove(0, expectedSize);
         expectedSize = -1;
@@ -53,7 +56,7 @@ void MonitorPage::readFrame() {
           );
         }
       }
-      else if (cmd == EYECLOSEDRATIO) {
+      else if (cmd == ProtocolType::EYECLOSEDRATIO) {
         QByteArray data = buffer.left(expectedSize);
         buffer.remove(0, expectedSize);
         expectedSize = -1;
