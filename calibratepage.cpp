@@ -44,9 +44,11 @@ void CalibratePage::activate() {
 void CalibratePage::deactivate() {
   writeProtocol(socket, ProtocolType::STOP);
   disconnect(socket, &QLocalSocket::readyRead, this, &CalibratePage::readFrame);
-  while (socket->bytesAvailable() > 0) {
+  while (socket->waitForReadyRead(100) > 0) {
     socket->readAll();
   }
+  buffer.clear();
+  expectedSize = -1;
 }
 
 void CalibratePage::moveToNextStep() {

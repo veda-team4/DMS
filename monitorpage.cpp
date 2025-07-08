@@ -21,9 +21,11 @@ void MonitorPage::activate() {
 void MonitorPage::deactivate() {
   writeProtocol(socket, ProtocolType::STOP);
   disconnect(socket, &QLocalSocket::readyRead, this, &MonitorPage::readFrame);
-  while (socket->bytesAvailable() > 0) {
+  while (socket->waitForReadyRead(100) > 0) {
     socket->readAll();
   }
+  buffer.clear();
+  expectedSize = -1;
 }
 
 void MonitorPage::readFrame() {

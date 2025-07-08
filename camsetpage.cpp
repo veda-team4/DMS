@@ -22,9 +22,11 @@ void CamSetPage::activate() {
 void CamSetPage::deactivate() {
   writeProtocol(socket, ProtocolType::STOP);
   disconnect(socket, &QLocalSocket::readyRead, this, &CamSetPage::readFrame);
-  while (socket->bytesAvailable() > 0) {
+  while (socket->waitForReadyRead(100)) {
     socket->readAll();
   }
+  buffer.clear();
+  expectedSize = -1;
 }
 
 void CamSetPage::readFrame() {
