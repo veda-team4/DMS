@@ -9,6 +9,7 @@ CalibratePage::CalibratePage(QWidget* parent, QLocalSocket* socket) : BasePage(p
   ui->progressBar->setValue(0);
   connect(ui->nextButton, &QPushButton::clicked, this, &CalibratePage::moveToNextStep);
   connect(ui->previousButton, &QPushButton::clicked, this, &CalibratePage::moveToPreviousStep);
+  connect(ui->closeButton, &QPushButton::clicked, qApp, QCoreApplication::quit);
 
   finishTimer = new QTimer(this);
   finishTimer->setInterval(100);

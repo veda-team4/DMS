@@ -6,6 +6,7 @@
 MonitorPage::MonitorPage(QWidget* parent, QLocalSocket* socket) : BasePage(parent), ui(new Ui::MonitorPage), socket(socket) {
   ui->setupUi(this);
   connect(ui->previousButton, &QPushButton::clicked, this, &MonitorPage::moveToPrevious);
+  connect(ui->closeButton, &QPushButton::clicked, qApp, QCoreApplication::quit);
 }
 
 MonitorPage::~MonitorPage()

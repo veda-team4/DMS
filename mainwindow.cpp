@@ -6,6 +6,9 @@
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
   ui->setupUi(this);
 
+  // 상단 바 제거
+  this->setWindowFlags(Qt::FramelessWindowHint);
+
   // 서버 프로세스, 소켓 생성
   serverProcess = new QProcess(this);
   socket = new QLocalSocket(this);
