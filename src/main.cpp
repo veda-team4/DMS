@@ -82,38 +82,30 @@ int main(void) {
   // 6. 루프 돌며 클라이언트로부터 명령 받아서 실행
   double thresholdEAR;
   while (true) {
-    uint8_t type;
-    uint32_t dataLen;
-    char buf[64] = { 0, };
-    readNBytes(client_fd, &type, 1);
-    if (type == COMMAND) {
-      readNBytes(client_fd, &dataLen, 4);
-      readNBytes(client_fd, buf, dataLen);
-      writeLog(std::string("message from client: ") + std::string(buf));
-      if (strcmp(buf, "camset") == 0) {
-        if (camsetpage() == -1) {
-          writeLog("camsetpage error");
-          break;
-        }
-      }
-      else if (strcmp(buf, "calibrate") == 0) {
-        if (calibratepage(thresholdEAR) == -1) {
-          writeLog("calibrate error");
-          break;
-        }
-      }
-      else if (strcmp(buf, "monitor") == 0) {
-        if (monitorpage(thresholdEAR) == -1) {
-          writeLog("monitor error");
-          break;
-        }
-      }
-      else if (strcmp(buf, "stop") == 0) {
+    uint8_t protocol;
+    readNBytes(client_fd, &protocol, 1);
+    if (protocol == ProtocolType::CAMSET) {
+      writeLog("message from client: CAMSET");
+      if (camsetpage() == -1) {
+        writeLog("camsetpage error");
         break;
       }
     }
-    else {
-      writeLog("Undefined situation");
+    else if (protocol == ProtocolType::CALIBRATE) {
+      writeLog("message from client: CALIBRATE");
+      if (calibratepage(thresholdEAR) == -1) {
+        writeLog("calibrate error");
+        break;
+      }
+    }
+    else if (protocol == ProtocolType::MONITOR) {
+      writeLog("message from client: MONITOR");
+      if (monitorpage(thresholdEAR) == -1) {
+        writeLog("monitor error");
+        break;
+      }
+    }
+    else if (protocol == ProtocolType::STOP) {
       break;
     }
   }

@@ -63,7 +63,7 @@ int writeNBytes(int fd, const void* buf, int len) {
 
 // 주어진 프레임 써주는 함수
 int writeFrame(int fd, const std::vector<uchar>& buf) {
-  uint8_t protocol = FRAME;
+  uint8_t protocol = ProtocolType::FRAME;
   uint32_t len = buf.size();
   if (writeNBytes(fd, &protocol, 1) == -1) return -1;
   if (writeNBytes(fd, &len, 4) == -1) return -1;
@@ -78,6 +78,11 @@ int writeData(int fd, uint8_t protocol, double data) {
   if (writeNBytes(fd, &len, 4) == -1) return -1;
   if (writeNBytes(fd, &data, len) == -1) return -1;
   return 0;
+}
+
+// 주어진 프로토콜 써주는 함수
+int writeProtocol(int fd, uint8_t protocol) {
+  return writeNBytes(fd, &protocol, sizeof(protocol));
 }
 
 double computeEAR(const dlib::full_object_detection& s, int idx) {

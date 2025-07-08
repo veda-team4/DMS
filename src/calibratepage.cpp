@@ -18,38 +18,29 @@ int calibratepage(double& thresholdEAR) {
   double openedEAR, closedEAR;
 
   while (true) {
-    uint8_t type;
-    if (recv(client_fd, &type, 1, MSG_DONTWAIT) == 1) {
-      if (type == COMMAND) {
-        uint32_t dataLen;
-        char buf[64] = { 0, };
-        readNBytes(client_fd, &dataLen, 4);
-        readNBytes(client_fd, buf, dataLen);
-        std::cout << "[Server] message from client: " << buf << std::endl;
-        // 클라이언트 측으로부터 msg 수신 시 while 문 빠져나감
-        if (strcmp(buf, "opened") == 0) {
-          calibrateEyes(openedEAR, true);
-        }
-        else if (strcmp(buf, "closed") == 0) {
-          calibrateEyes(closedEAR, false);
+    uint8_t protocol;
+    if (recv(client_fd, &protocol, 1, MSG_DONTWAIT) == 1) {
+      if (protocol == ProtocolType::CALIBRATE_OPENED) {
+        writeLog("message from client: CALIBRATE_OPENED");
+        calibrateEyes(openedEAR, true);
+      }
+      else if (protocol == ProtocolType::CALIBRATE_CLOSED) {
+        writeLog("message from client: CALIBRATE_CLOSED");
+        calibrateEyes(closedEAR, false);
+        // EAR threshold 값 계산
+        thresholdEAR = closedEAR + (openedEAR - closedEAR) * EAR_THRESH_VAL;
 
-          // EAR threshold 값 계산
-          thresholdEAR = closedEAR + (openedEAR - closedEAR) * EAR_THRESH_VAL;
+        // 클라이언트에 EAR threshold 값 전송하기
+        uint8_t protocol = ProtocolType::EARTHRESHOLD;
+        if (writeData(client_fd, protocol, thresholdEAR) == -1) return -1;
 
-          // 클라이언트에 EAR threshold 값 전송하기
-          uint8_t protocol = EARTHRESHOLD;
-          if (writeData(client_fd, protocol, thresholdEAR) == -1) return -1;
-
-          writeLog(std::string("Opened: " + std::to_string(openedEAR)));
-          writeLog(std::string("Closed: " + std::to_string(closedEAR)));
-          writeLog(std::string("Threshold: ") + std::to_string(thresholdEAR));
-        }
-        else if (strcmp(buf, "stop") == 0) {
-          return 0;
-        }
-        else {
-          return -1;
-        }
+        writeLog(std::string("Opened: " + std::to_string(openedEAR)));
+        writeLog(std::string("Closed: " + std::to_string(closedEAR)));
+        writeLog(std::string("Threshold: ") + std::to_string(thresholdEAR));
+      }
+      else if (protocol == ProtocolType::STOP) {
+        writeLog("message from client: STOP");
+        return 0;
       }
       else {
         return -1;
@@ -114,21 +105,12 @@ int calibrateEyes(double& ear, bool opened) {
 
   // 클라이언트 측으로부터 finish 수신할 때까지 프레임 전송하며 EAR 계산
   while (true) {
-    uint8_t type;
-    if (recv(client_fd, &type, 1, MSG_DONTWAIT) == 1) {
-      if (type == COMMAND) {
-        uint32_t dataLen;
-        char buf[64] = { 0, };
-        readNBytes(client_fd, &dataLen, 4);
-        readNBytes(client_fd, buf, dataLen);
-        std::cout << "[Server] message from client: " << buf << std::endl;
-        // 클라이언트 측으로부터 finish 수신 시 while 문 빠져나감
-        if (strcmp(buf, "finish") == 0) {
-          break;
-        }
-        else {
-          return -1;
-        }
+    uint8_t protocol;
+    if (recv(client_fd, &protocol, 1, MSG_DONTWAIT) == 1) {
+      // 클라이언트 측으로부터 finish 수신 시 while 문 빠져나감
+      if (protocol == ProtocolType::CALIBRATE_FINISH) {
+        writeLog("message from client: CALIBRATE_FINISH");
+        break;
       }
       else {
         return -1;
@@ -190,7 +172,7 @@ int calibrateEyes(double& ear, bool opened) {
   ear = earSum / earCount;
 
   // 클라이언트에 EAR 값 전송하기
-  uint8_t protocol = (opened ? OPENEDEAR : CLOSEDEAR);
+  uint8_t protocol = (opened ? ProtocolType::OPENEDEAR : ProtocolType::CLOSEDEAR);
   uint32_t size = sizeof(ear);
   if (writeData(client_fd, protocol, ear) == -1) return -1;
 
