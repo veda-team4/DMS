@@ -1,4 +1,6 @@
 #include <iostream>
+#include <QMouseEvent>
+#include <QWindow>
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "utils.h"
@@ -8,6 +10,18 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
   // 상단 바 제거
   this->setWindowFlags(Qt::FramelessWindowHint);
+
+  // (0, 0) 으로 이동
+  this->move(0, 0);
+
+  // dragLabel에 이벤트 필터 설치
+  ui->dragLabel->installEventFilter(this);
+
+  // 종료 버튼 클릭 시 앱 종료
+  connect(ui->closeButton, &QPushButton::clicked, qApp, QCoreApplication::quit);
+
+  // 종료 버튼 꾸미기
+  ui->closeButton->setStyleSheet("QPushButton { background-color: red; color: white; border: none; }");
 
   // 서버 프로세스, 소켓 생성
   serverProcess = new QProcess(this);
@@ -55,15 +69,11 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
   monitorPage = new MonitorPage(nullptr, socket);
 
   // 페이지 스택에 추가
-  widgetStack = new QStackedWidget(this);
-  widgetStack->addWidget(startPage);
-  widgetStack->addWidget(camSetPage);
-  widgetStack->addWidget(calibratePage);
-  widgetStack->addWidget(monitorPage);
-  widgetStack->setCurrentWidget(startPage);
-
-  // 메인 윈도우의 중앙 위젯을 widgetStack 으로 설정
-  setCentralWidget(widgetStack);
+  ui->stackedWidget->addWidget(startPage);
+  ui->stackedWidget->addWidget(camSetPage);
+  ui->stackedWidget->addWidget(calibratePage);
+  ui->stackedWidget->addWidget(monitorPage);
+  ui->stackedWidget->setCurrentWidget(startPage);
 
   // 각 페이지에서 버튼 클릭 시 다음 또는 이전 페이지로 이동할 수 있도록 설정
   connect(startPage, &StartPage::moveToNext, this, &MainWindow::showCamSetPage);
@@ -82,7 +92,6 @@ MainWindow::~MainWindow() {
   delete startPage;
   delete camSetPage;
   delete calibratePage;
-  delete widgetStack;
   socket->disconnectFromServer();
   delete socket;
   serverProcess->terminate();
@@ -91,33 +100,62 @@ MainWindow::~MainWindow() {
   }
 }
 
+bool MainWindow::eventFilter(QObject* obj, QEvent* event) {
+  if (obj == ui->dragLabel) {
+    if (event->type() == QEvent::MouseButtonPress) {
+      QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+      if (mouseEvent->button() == Qt::LeftButton) {
+        m_isDragging = true;
+        m_dragStartPosition = mouseEvent->globalPos() - frameGeometry().topLeft();
+        return true;
+      }
+    }
+    else if (event->type() == QEvent::MouseMove) {
+      QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+      if (m_isDragging && (mouseEvent->buttons() & Qt::LeftButton)) {
+        move(mouseEvent->globalPos() - m_dragStartPosition);
+        return true;
+      }
+    }
+    else if (event->type() == QEvent::MouseButtonRelease) {
+      QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+      if (mouseEvent->button() == Qt::LeftButton) {
+        m_isDragging = false;
+        return true;
+      }
+    }
+  }
+
+  return QMainWindow::eventFilter(obj, event);
+}
+
 void MainWindow::showStartPage() {
-  if (auto prev = qobject_cast<BasePage*>(widgetStack->currentWidget())) {
+  if (auto prev = qobject_cast<BasePage*>(ui->stackedWidget->currentWidget())) {
     prev->deactivate();
   }
-  widgetStack->setCurrentWidget(startPage);
+  ui->stackedWidget->setCurrentWidget(startPage);
 }
 
 void MainWindow::showCamSetPage() {
-  if (auto prev = qobject_cast<BasePage*>(widgetStack->currentWidget())) {
+  if (auto prev = qobject_cast<BasePage*>(ui->stackedWidget->currentWidget())) {
     prev->deactivate();
   }
-  widgetStack->setCurrentWidget(camSetPage);
+  ui->stackedWidget->setCurrentWidget(camSetPage);
   camSetPage->activate();
 }
 
 void MainWindow::showCalibratePage() {
-  if (auto prev = qobject_cast<BasePage*>(widgetStack->currentWidget())) {
+  if (auto prev = qobject_cast<BasePage*>(ui->stackedWidget->currentWidget())) {
     prev->deactivate();
   }
-  widgetStack->setCurrentWidget(calibratePage);
+  ui->stackedWidget->setCurrentWidget(calibratePage);
   calibratePage->activate();
 }
 
 void MainWindow::showMonitorPage() {
-  if (auto prev = qobject_cast<BasePage*>(widgetStack->currentWidget())) {
+  if (auto prev = qobject_cast<BasePage*>(ui->stackedWidget->currentWidget())) {
     prev->deactivate();
   }
-  widgetStack->setCurrentWidget(monitorPage);
+  ui->stackedWidget->setCurrentWidget(monitorPage);
   monitorPage->activate();
 }

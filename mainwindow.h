@@ -5,6 +5,8 @@
 #include <QStackedWidget>
 #include <QProcess>
 #include <QLocalSocket>
+#include <QMouseEvent>
+#include <QPoint>
 #include "startpage.h"
 #include "camsetpage.h"
 #include "calibratepage.h"
@@ -24,6 +26,9 @@ public:
   MainWindow(QWidget* parent = nullptr);
   ~MainWindow();
 
+protected:
+  bool eventFilter(QObject* obj, QEvent* event) override;
+
 private slots:
   void showStartPage();
   void showCamSetPage();
@@ -31,15 +36,18 @@ private slots:
   void showMonitorPage();
 
 private:
+  Ui::MainWindow* ui;
 
-  QStackedWidget* widgetStack;
+  QPoint m_dragStartPosition;
+  bool m_isDragging;
+
   BasePage* startPage;
   BasePage* camSetPage;
   BasePage* calibratePage;
   BasePage* monitorPage;
-  Ui::MainWindow* ui;
 
   QProcess* serverProcess;
   QLocalSocket* socket;
+
 };
 #endif // MAINWINDOW_H
