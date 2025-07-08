@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.5)
 
 project(dms_qt VERSION 0.1 LANGUAGES CXX)
 
+set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_SOURCE_DIR}/ui)
+
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -14,16 +16,16 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Network)
 
 set(PROJECT_SOURCES
-        main.cpp
-        basepage.cpp basepage.h
-        mainwindow.cpp mainwindow.h mainwindow.ui
-        startpage.cpp startpage.h startpage.ui
-        camsetpage.cpp camsetpage.h camsetpage.ui
-        calibratepage.cpp calibratepage.h calibratepage.ui
-        monitorpage.cpp monitorpage.h monitorpage.ui
-        utils.cpp utils.h
-        protocols.h
-        resources.qrc
+        src/main.cpp
+        src/basepage.cpp include/basepage.h
+        src/mainwindow.cpp include/mainwindow.h ui/mainwindow.ui
+        src/startpage.cpp include/startpage.h ui/startpage.ui
+        src/camsetpage.cpp include/camsetpage.h ui/camsetpage.ui
+        src/calibratepage.cpp include/calibratepage.h ui/calibratepage.ui
+        src/monitorpage.cpp include/monitorpage.h ui/monitorpage.ui
+        src/utils.cpp include/utils.h
+        include/protocols.h
+        resources/resources.qrc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -48,6 +50,8 @@ else()
         )
     endif()
 endif()
+
+target_include_directories(dms_qt PRIVATE include)
 
 target_link_libraries(dms_qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network)
 
