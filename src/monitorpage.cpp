@@ -23,20 +23,11 @@ int monitorpage(double thresholdEAR) {
 
   while (true) {
     // 클라이언트 측으로부터 "stop" 수신 시 종료
-    uint8_t type;
-    if (recv(client_fd, &type, 1, MSG_DONTWAIT) == 1) {
-      if (type == COMMAND) {
-        uint32_t dataLen;
-        char buf[64] = { 0, };
-        readNBytes(client_fd, &dataLen, 4);
-        readNBytes(client_fd, buf, dataLen);
-        writeLog(std::string("message from client: ") + std::string(buf));
-        if (strcmp(buf, "stop") == 0) {
-          return 0;
-        }
-        else {
-          return -1;
-        }
+    uint8_t protocol;
+    if (recv(client_fd, &protocol, 1, MSG_DONTWAIT) == 1) {
+      if (protocol == ProtocolType::STOP) {
+        writeLog("message from client: STOP");
+        return 0;
       }
       else {
         return -1;
@@ -133,7 +124,7 @@ int monitorpage(double thresholdEAR) {
     }
 
     // 눈 감김 비율 전송
-    uint8_t protocol = EYECLOSEDRATIO;
+    protocol = ProtocolType::EYECLOSEDRATIO;
     if (writeData(client_fd, protocol, eyeClosedRatio) == -1) {
       return -1;
     }
