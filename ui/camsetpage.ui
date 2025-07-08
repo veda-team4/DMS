@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>620</width>
-    <height>450</height>
+    <width>640</width>
+    <height>440</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,118 +18,135 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>620</width>
-    <height>450</height>
+    <width>640</width>
+    <height>440</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>620</width>
-    <height>450</height>
+    <width>640</width>
+    <height>440</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <widget class="QLabel" name="infoLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>360</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>360</width>
-         <height>30</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <family>NanumGothic</family>
-         <pointsize>12</pointsize>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>얼굴이 잘 인식되는 각도로 카메라를 놓아주세요.</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="videoLabel">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>440</width>
-         <height>330</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>440</width>
-         <height>330</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item alignment="Qt::AlignHCenter">
-      <widget class="QPushButton" name="nextButton">
-       <property name="maximumSize">
-        <size>
-         <width>80</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Next</string>
-       </property>
-      </widget>
-     </item>
-     <item alignment="Qt::AlignHCenter">
-      <widget class="QPushButton" name="previousButton">
-       <property name="maximumSize">
-        <size>
-         <width>80</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Previous</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-  </layout>
+  <widget class="QLabel" name="infoLabel">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>30</y>
+     <width>360</width>
+     <height>19</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>360</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>360</width>
+     <height>30</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <family>NanumGothic</family>
+     <pointsize>12</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>얼굴이 잘 인식되는 각도로 카메라를 놓아주세요.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="videoLabel">
+   <property name="geometry">
+    <rect>
+     <x>15</x>
+     <y>60</y>
+     <width>480</width>
+     <height>360</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>16777215</height>
+    </size>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 1px solid black</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="nextButton">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>370</y>
+     <width>80</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>80</width>
+     <height>16777215</height>
+    </size>
+   </property>
+   <property name="text">
+    <string>Next</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="previousButton">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>400</y>
+     <width>80</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>80</width>
+     <height>16777215</height>
+    </size>
+   </property>
+   <property name="text">
+    <string>Previous</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

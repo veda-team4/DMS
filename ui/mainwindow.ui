@@ -19,7 +19,7 @@
   <property name="minimumSize">
    <size>
     <width>640</width>
-    <height>460</height>
+    <height>480</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -30,6 +30,9 @@
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QMainWindow { border: 2px solid black; }</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
@@ -50,7 +53,25 @@
      <height>480</height>
     </size>
    </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="spacing">
@@ -58,17 +79,26 @@
       </property>
       <item>
        <widget class="QLabel" name="dragLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
-          <width>640</width>
-          <height>20</height>
+          <width>605</width>
+          <height>30</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>16777215</width>
-          <height>20</height>
+          <width>605</width>
+          <height>30</height>
          </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true"/>
         </property>
         <property name="text">
          <string/>
@@ -81,7 +111,7 @@
       <item>
        <widget class="QPushButton" name="closeButton">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -115,13 +145,13 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>620</width>
+        <width>640</width>
         <height>450</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>620</width>
+        <width>640</width>
         <height>450</height>
        </size>
       </property>
