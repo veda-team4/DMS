@@ -12,16 +12,13 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
   this->setWindowFlags(Qt::FramelessWindowHint);
 
   // (0, 0) 으로 이동
-  this->move(0, 0);
+  // this->move(0, 0);
 
   // dragLabel에 이벤트 필터 설치
   ui->dragLabel->installEventFilter(this);
 
   // 종료 버튼 클릭 시 앱 종료
   connect(ui->closeButton, &QPushButton::clicked, qApp, QCoreApplication::quit);
-
-  // 종료 버튼 꾸미기
-  ui->closeButton->setStyleSheet("QPushButton { background-color: red; color: white; border: none; }");
 
   // 서버 프로세스, 소켓 생성
   serverProcess = new QProcess(this);

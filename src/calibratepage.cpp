@@ -60,7 +60,7 @@ void CalibratePage::moveToNextStep() {
     writeProtocol(socket, ProtocolType::CALIBRATE_OPENED);
     ui->nextButton->setEnabled(false);
     ui->previousButton->setEnabled(false);
-    ui->infoLabel->setText("뜬 눈 크기 측정중.");
+    ui->infoLabel->setText("뜬 눈 크기 측정중. . . .");
     progressStep = 0;
     ui->progressBar->setValue(0);
     finishTimer->start();
@@ -75,7 +75,7 @@ void CalibratePage::moveToNextStep() {
     writeProtocol(socket, ProtocolType::CALIBRATE_CLOSED);
     ui->nextButton->setEnabled(false);
     ui->previousButton->setEnabled(false);
-    ui->infoLabel->setText("감은 눈 크기 측정중.");
+    ui->infoLabel->setText("감은 눈 크기 측정중. . . .");
     progressStep = 0;
     ui->progressBar->setValue(0);
     finishTimer->start();
