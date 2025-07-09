@@ -129,11 +129,6 @@ int monitorpage(double thresholdEAR) {
       return -1;
     }
 
-    // 눈 감김 비율이 임계치 넘을 시 경고
-    if (eyeClosedRatio >= BLINK_RATIO_THRESH) {
-      cv::putText(frame, "SLEEPING !!!!", cv::Point(faceRect.left(), faceRect.top() - 40), cv::FONT_HERSHEY_SIMPLEX, 0.9, cv::Scalar(0, 0, 255), 2);
-    }
-
     // 머리 떨어짐 감지 및 출력
     static unsigned long long i = 0;
     if (downCount >= MAX_DOWN_COUNT) {
