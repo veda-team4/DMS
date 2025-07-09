@@ -3,7 +3,9 @@ sudo apt-get install qtcreator qtbase5-dev qtchooser qtbase5-dev-tools cmake
 
 # 한글 폰트 설치
 https://m.blog.naver.com/mythee1/223300805398
-https://blog.naver.com/rlrkcka/223513392314
+sudo apt-get install fonts-unfonts-core
+sudo fc-cache -fv
+sudo reboot
 
 # 상단바 제거 
 ~/.config/wf-panel-pi.ini
