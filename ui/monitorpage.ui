@@ -138,6 +138,93 @@ padding-top: 3px;</string>
     <number>0</number>
    </property>
   </widget>
+  <widget class="QLabel" name="wakeupLabel">
+   <property name="geometry">
+    <rect>
+     <x>15</x>
+     <y>70</y>
+     <width>230</width>
+     <height>50</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>16</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 2px solid red;
+border-radius: 8px;
+background-color: white;
+outline: none;</string>
+   </property>
+   <property name="text">
+    <string>WAKE UP ! ! ! ! ! !</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="co2Label">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>150</y>
+     <width>90</width>
+     <height>60</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 2px solid black;
+border-radius: 8px;
+background-color: white;
+outline: none;
+padding-top: 3px;</string>
+   </property>
+   <property name="text">
+    <string>CO2</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignHCenter|Qt::AlignTop</set>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="co2Value">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>180</y>
+     <width>90</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 2px solid black;
+border-radius: 8px;
+background-color: white;
+outline: none;</string>
+   </property>
+   <property name="text">
+    <string>800 ppm</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
   <widget class="QLabel" name="infoLabel">
    <property name="geometry">
     <rect>
@@ -224,11 +311,56 @@ outline: none;</string>
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <zorder></zorder>
-  <zorder></zorder>
+  <widget class="QPushButton" name="wakeupCloseButton">
+   <property name="geometry">
+    <rect>
+     <x>228</x>
+     <y>70</y>
+     <width>17</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>16777215</width>
+     <height>16777215</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+    border: 2px solid black;
+    border-radius: 8px;
+    background-color: white;
+    outline: none;
+}
+
+QPushButton:focus {
+    outline: none;
+}
+
+QPushButton:pressed {
+    background-color: #e0e0e0;
+}</string>
+   </property>
+   <property name="text">
+    <string>X</string>
+   </property>
+  </widget>
+  <zorder>infoLabel</zorder>
+  <zorder>videoLabel</zorder>
   <zorder>previousButton</zorder>
   <zorder>sleepingRateLabel</zorder>
   <zorder>sleepingBar</zorder>
+  <zorder>wakeupLabel</zorder>
+  <zorder>co2Label</zorder>
+  <zorder>co2Value</zorder>
+  <zorder>wakeupCloseButton</zorder>
  </widget>
  <resources/>
  <connections/>

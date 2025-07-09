@@ -4,7 +4,10 @@
 #include <QWidget>
 #include <QLocalSocket>
 #include <QByteArray>
+#include <QTimer>
 #include "basepage.h"
+
+#define BLINK_RATIO_THRESH 0.6 // 2초 중 얼만큼을 눈을 감아야 경고할지에 대한 비율
 
 namespace Ui {
   class MonitorPage;
@@ -26,6 +29,11 @@ private:
   QByteArray buffer;
   int expectedSize = -1;
   quint8 cmd;
+
+  QTimer* wakeupTimer;
+  bool wakeupFlashOn = false;
+  bool wakeupFlashing = false;
+
   void readFrame();
 };
 
