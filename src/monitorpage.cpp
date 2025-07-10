@@ -36,11 +36,11 @@ MonitorPage::~MonitorPage()
 
 void MonitorPage::activate() {
   connect(socket, &QLocalSocket::readyRead, this, &MonitorPage::readFrame);
-  writeEncryptedCommand(socket, ProtocolType::MONITOR);
+  writeEncryptedCommand(socket, Protocol::MONITOR);
 }
 
 void MonitorPage::deactivate() {
-  writeEncryptedCommand(socket, ProtocolType::STOP);
+  writeEncryptedCommand(socket, Protocol::STOP);
   disconnect(socket, &QLocalSocket::readyRead, this, &MonitorPage::readFrame);
   while (socket->waitForReadyRead(100) > 0) {
     socket->readAll();
@@ -90,7 +90,7 @@ void MonitorPage::readFrame() {
       quint8 cmd = static_cast<quint8>(decrypted[0]);
       quint32 dataLen = *reinterpret_cast<const quint32*>(decrypted.constData() + 1);
 
-      if (cmd == ProtocolType::FRAME) {
+      if (cmd == Protocol::FRAME) {
         QByteArray imageData = QByteArray::fromRawData(decrypted.constData() + 5, dataLen);
 
         QPixmap pixmap;
@@ -100,7 +100,7 @@ void MonitorPage::readFrame() {
           );
         }
       }
-      else if (cmd == ProtocolType::EYECLOSEDRATIO) {
+      else if (cmd == Protocol::EYECLOSEDRATIO) {
         double value = *reinterpret_cast<const double*>(decrypted.constData() + 5);
         ui->sleepingBar->setValue((int)(value * 100.0));
 

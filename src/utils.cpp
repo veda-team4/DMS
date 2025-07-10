@@ -6,14 +6,6 @@
 #include <openssl/aes.h>
 #include <openssl/rand.h>
 
-void writeProtocol(QLocalSocket* socket, uint8_t protocol) {
-  QByteArray packet;
-  packet.append(static_cast<char>(protocol));
-  socket->write(packet);
-  socket->flush();
-}
-
-// 버퍼로부터 주어진 길이의 바이트만큼 읽어 파일 디스크립터에 써주는 함수
 int writeNBytes(QLocalSocket* socket, const void* buf, int len) {
   int totalWritten = 0;
   const char* buffer = (const char*)buf;
@@ -60,28 +52,6 @@ void writeEncryptedCommand(QLocalSocket* socket, uint8_t command) {
 
   // 3. 암호문 전송
   writeNBytes(socket, ciphertext, ciphertext_len);
-}
-
-int readNBytes(QLocalSocket* socket, void* buf, int len) {
-  int totalRead = 0;
-
-  char* buffer = (char*)buf;
-
-  while (totalRead < len) {
-    qint64 bytesRead = socket->read(buffer + totalRead, len - totalRead);
-
-    if (bytesRead < 0) {
-      qWarning() << "Socket read error:" << socket->errorString();
-      return -1;
-    }
-    else if (bytesRead == 0) {
-      break;
-    }
-
-    totalRead += bytesRead;
-  }
-
-  return (totalRead == len) ? totalRead : -1;
 }
 
 void writeLog(std::string log) {

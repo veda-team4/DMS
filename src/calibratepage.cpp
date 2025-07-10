@@ -30,7 +30,7 @@ CalibratePage::~CalibratePage() {
 }
 
 void CalibratePage::activate() {
-  writeEncryptedCommand(socket, ProtocolType::CALIBRATE);
+  writeEncryptedCommand(socket, Protocol::CALIBRATE);
   connect(socket, &QLocalSocket::readyRead, this, &CalibratePage::readFrame);
   clickCount = 0;
   progressStep = 0;
@@ -42,7 +42,7 @@ void CalibratePage::activate() {
 }
 
 void CalibratePage::deactivate() {
-  writeEncryptedCommand(socket, ProtocolType::STOP);
+  writeEncryptedCommand(socket, Protocol::STOP);
   disconnect(socket, &QLocalSocket::readyRead, this, &CalibratePage::readFrame);
   while (socket->waitForReadyRead(100) > 0) {
     socket->readAll();
@@ -57,7 +57,7 @@ void CalibratePage::moveToNextStep() {
   double ear;
   switch (clickCount) {
   case 0:
-    writeEncryptedCommand(socket, ProtocolType::CALIBRATE_OPENED);
+    writeEncryptedCommand(socket, Protocol::CALIBRATE_OPENED);
     ui->nextButton->setEnabled(false);
     ui->previousButton->setEnabled(false);
     ui->infoLabel->setText("뜬 눈 크기 측정중. . . .");
@@ -66,13 +66,13 @@ void CalibratePage::moveToNextStep() {
     finishTimer->start();
     break;
   case 1:
-    writeEncryptedCommand(socket, ProtocolType::CALIBRATE_FINISH);
+    writeEncryptedCommand(socket, Protocol::CALIBRATE_FINISH);
     ui->nextButton->setEnabled(true);
     ui->previousButton->setEnabled(true);
     ui->infoLabel->setText("감은 눈의 크기를 측정합니다. 준비 완료 시 버튼을 눌러주세요.");
     break;
   case 2:
-    writeEncryptedCommand(socket, ProtocolType::CALIBRATE_CLOSED);
+    writeEncryptedCommand(socket, Protocol::CALIBRATE_CLOSED);
     ui->nextButton->setEnabled(false);
     ui->previousButton->setEnabled(false);
     ui->infoLabel->setText("감은 눈 크기 측정중. . . .");
@@ -81,7 +81,7 @@ void CalibratePage::moveToNextStep() {
     finishTimer->start();
     break;
   case 3:
-    writeEncryptedCommand(socket, ProtocolType::CALIBRATE_FINISH);
+    writeEncryptedCommand(socket, Protocol::CALIBRATE_FINISH);
     ui->nextButton->setEnabled(true);
     ui->previousButton->setEnabled(true);
     ui->infoLabel->setText("눈 크기 측정 완료. 시작하려면 버튼을 눌러주세요.");
@@ -157,7 +157,7 @@ void CalibratePage::readFrame() {
       quint8 cmd = static_cast<quint8>(decrypted[0]);
       quint32 dataLen = *reinterpret_cast<const quint32*>(decrypted.constData() + 1);
 
-      if (cmd == ProtocolType::FRAME) {
+      if (cmd == Protocol::FRAME) {
         QByteArray imageData = QByteArray::fromRawData(decrypted.constData() + 5, dataLen);
 
         QPixmap pixmap;
@@ -167,15 +167,15 @@ void CalibratePage::readFrame() {
           );
         }
       }
-      else if (cmd == ProtocolType::OPENEDEAR || cmd == ProtocolType::CLOSEDEAR || cmd == ProtocolType::EARTHRESHOLD) {
+      else if (cmd == Protocol::OPENEDEAR || cmd == Protocol::CLOSEDEAR || cmd == Protocol::EARTHRESHOLD) {
         double value = *reinterpret_cast<const double*>(decrypted.constData() + 5);
-        if (cmd == ProtocolType::OPENEDEAR) {
+        if (cmd == Protocol::OPENEDEAR) {
           ui->openedVal->setText(QString::number(value));
         }
-        else if (cmd == ProtocolType::CLOSEDEAR) {
+        else if (cmd == Protocol::CLOSEDEAR) {
           ui->closedVal->setText(QString::number(value));
         }
-        else if (cmd == ProtocolType::EARTHRESHOLD) {
+        else if (cmd == Protocol::EARTHRESHOLD) {
           ui->thresholdVal->setText(QString::number(value));
         }
       }

@@ -16,11 +16,11 @@ CamSetPage::~CamSetPage() {
 
 void CamSetPage::activate() {
   connect(socket, &QLocalSocket::readyRead, this, &CamSetPage::readFrame);
-  writeEncryptedCommand(socket, ProtocolType::CAMSET);
+  writeEncryptedCommand(socket, Protocol::CAMSET);
 }
 
 void CamSetPage::deactivate() {
-  writeEncryptedCommand(socket, ProtocolType::STOP);
+  writeEncryptedCommand(socket, Protocol::STOP);
   disconnect(socket, &QLocalSocket::readyRead, this, &CamSetPage::readFrame);
   while (socket->waitForReadyRead(100)) {
     socket->readAll();
@@ -70,7 +70,7 @@ void CamSetPage::readFrame() {
       quint8 cmd = static_cast<quint8>(decrypted[0]);
       quint32 dataLen = *reinterpret_cast<const quint32*>(decrypted.constData() + 1);
 
-      if (cmd == ProtocolType::FRAME) {
+      if (cmd == Protocol::FRAME) {
         QByteArray imageData = QByteArray::fromRawData(decrypted.constData() + 5, dataLen);
 
         QPixmap pixmap;
