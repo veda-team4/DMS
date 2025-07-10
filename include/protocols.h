@@ -17,6 +17,8 @@
 protocols.h 에는 첫 1바이트에 해당하는 Type 을 정의한다
 */
 
+extern unsigned char key[33];
+
 namespace ProtocolType {
   enum Type : uint8_t {
     CAMSET,

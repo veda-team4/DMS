@@ -6,9 +6,6 @@
 #include <openssl/aes.h>
 #include <openssl/rand.h>
 
-static unsigned char key[33] = "abcdefghijklmnopqrstuvwxyz012345";
-static unsigned char iv[16];
-
 void writeProtocol(QLocalSocket* socket, uint8_t protocol) {
   QByteArray packet;
   packet.append(static_cast<char>(protocol));
