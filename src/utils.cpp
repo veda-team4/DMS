@@ -111,6 +111,26 @@ uint8_t readEncryptedCommand(int fd) {
   return plaintext[0];
 }
 
+uint8_t readEncryptedCommandNonBlock(int fd) {
+  if (recv(fd, iv, 16, MSG_DONTWAIT) < 0) { // IV 수신
+    return ProtocolType::NOTHING;
+  }
+
+  uint32_t ciphertext_len;
+  recv(fd, &ciphertext_len, 4, MSG_WAITALL); // 길이 수신
+
+  unsigned char ciphertext[32];
+  recv(fd, ciphertext, ciphertext_len, MSG_WAITALL); // 암호문 수신
+
+  unsigned char plaintext[32];
+  int plaintext_len;
+
+  aes_decrypt(ciphertext, ciphertext_len, key, iv, plaintext, plaintext_len);
+  ciphertext[plaintext_len] = '\0';
+
+  return plaintext[0];
+}
+
 double computeEAR(const dlib::full_object_detection& s, int idx) {
   auto dist = [](const dlib::point& a, const dlib::point& b) {
     double dx = a.x() - b.x(), dy = a.y() - b.y();

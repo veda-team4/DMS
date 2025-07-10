@@ -19,7 +19,8 @@ int calibratepage(double& thresholdEAR) {
 
   while (true) {
     uint8_t protocol;
-    if (recv(client_fd, &protocol, 1, MSG_DONTWAIT) == 1) {
+    protocol = readEncryptedCommandNonBlock(client_fd);
+    if (protocol != ProtocolType::NOTHING) {
       if (protocol == ProtocolType::CALIBRATE_OPENED) {
         writeLog("message from client: CALIBRATE_OPENED");
         calibrateEyes(openedEAR, true);
@@ -106,7 +107,8 @@ int calibrateEyes(double& ear, bool opened) {
   // 클라이언트 측으로부터 finish 수신할 때까지 프레임 전송하며 EAR 계산
   while (true) {
     uint8_t protocol;
-    if (recv(client_fd, &protocol, 1, MSG_DONTWAIT) == 1) {
+    protocol = readEncryptedCommandNonBlock(client_fd);
+    if (protocol != ProtocolType::NOTHING) {
       // 클라이언트 측으로부터 finish 수신 시 while 문 빠져나감
       if (protocol == ProtocolType::CALIBRATE_FINISH) {
         writeLog("message from client: CALIBRATE_FINISH");

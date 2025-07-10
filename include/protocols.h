@@ -30,7 +30,8 @@ namespace ProtocolType {
     MONITOR,
     EYECLOSEDRATIO,
     FRAME,
-    STOP
+    STOP,
+    NOTHING
   };
 }
 

@@ -24,7 +24,8 @@ int monitorpage(double thresholdEAR) {
   while (true) {
     // 클라이언트 측으로부터 "stop" 수신 시 종료
     uint8_t protocol;
-    if (recv(client_fd, &protocol, 1, MSG_DONTWAIT) == 1) {
+    protocol = readEncryptedCommandNonBlock(client_fd);
+    if (protocol != ProtocolType::NOTHING) {
       if (protocol == ProtocolType::STOP) {
         writeLog("message from client: STOP");
         return 0;
