@@ -88,6 +88,17 @@ void MonitorPage::readFrame() {
 
       // 복호화된 평문에서 명령과 길이 추출
       quint8 cmd = static_cast<quint8>(decrypted[0]);
+
+      if(cmd == Protocol::HEADDROPPED) {
+        if(!wakeupFlashing) {
+            wakeupFlashing = true;
+            ui->wakeupLabel->show();
+            wakeupTimer->start(300);
+            ui->wakeupCloseButton->show();
+        }
+        return;
+      }
+
       quint32 dataLen = *reinterpret_cast<const quint32*>(decrypted.constData() + 1);
 
       if (cmd == Protocol::FRAME) {

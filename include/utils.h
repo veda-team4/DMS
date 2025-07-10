@@ -16,7 +16,7 @@ void writeLog(std::string log);
 // 버퍼로부터 주어진 길이의 바이트만큼 읽어 파일 디스크립터에 써주는 함수
 int writeNBytes(QLocalSocket* socket, const void* buf, int len);
 // socket에 암호화된 1바이트 명령어 전송하는 함수
-void writeEncryptedCommand(QLocalSocket* socket, uint8_t command);
+int writeEncryptedCommand(QLocalSocket* socket, uint8_t command);
 // ****************************************************************
 
 // ************* OpenSSL 이용한 암호화, 복호화 함수 ***************

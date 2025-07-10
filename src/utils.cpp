@@ -32,26 +32,24 @@ int writeNBytes(QLocalSocket* socket, const void* buf, int len) {
   return totalWritten == len ? totalWritten : -1;
 }
 
-void writeEncryptedCommand(QLocalSocket* socket, uint8_t command) {
+int writeEncryptedCommand(QLocalSocket* socket, uint8_t command) {
   unsigned char iv[16];
   RAND_bytes(iv, sizeof(iv));  // 무작위 IV 생성
 
   // 평문 명령 1바이트 준비
   unsigned char plaintext[1] = { command };
 
-  unsigned char ciphertext[32];  // AES 패딩 때문에 16 이상 필요
+  unsigned char ciphertext[64];
   int ciphertext_len;
 
   aes_encrypt(plaintext, 1, key, iv, ciphertext, &ciphertext_len);
 
-  // 1. IV 전송
-  writeNBytes(socket, iv, 16);
-
-  // 2. 암호문 길이 전송
-  writeNBytes(socket, &ciphertext_len, 4);
-
-  // 3. 암호문 전송
-  writeNBytes(socket, ciphertext, ciphertext_len);
+  // 전송 구조: [IV(16)] + [암호문 길이(4)] + [암호문]
+  if (writeNBytes(socket, iv, 16) == -1) return -1;
+  if (writeNBytes(socket, &ciphertext_len, 4) == -1) return -1;
+  if (writeNBytes(socket, ciphertext, ciphertext_len) == -1) return -1;
+  
+  return 0;
 }
 
 void writeLog(std::string log) {
