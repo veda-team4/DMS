@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
   // 서버 프로세스 실행
   serverProcess->setWorkingDirectory(SERVER_PATH);
-  serverProcess->start(QString(SERVER_PATH) + QString("/camera_server"), QStringList());
+  serverProcess->start(QString(SERVER_PATH) + QString("/dms_server"), QStringList());
 
   // 서버 프로세스 실행 기다림
   if (!serverProcess->waitForStarted(50000)) {
