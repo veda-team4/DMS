@@ -14,7 +14,6 @@
 #include "global.h"
 
 static unsigned char key[33] = "abcdefghijklmnopqrstuvwxyz012345";
-static unsigned char iv[16];
 
 // 파일 디스크립터로부터 주어진 길이의 바이트만큼 읽어 버퍼에 저장해주는 함수
 int readNBytes(int fd, void* buf, int len) {
@@ -79,6 +78,38 @@ int writeFrame(int fd, const std::vector<uchar>& buf) {
   return 0;
 }
 
+// 주어진 프레임 암호화해서 써주는 함수
+int writeEncryptedFrame(int fd, const std::vector<uchar>& buf) {
+  // 1. 평문 만들기: protocol + len + frame data
+  uint8_t protocol = ProtocolType::FRAME;
+  uint32_t len = buf.size();
+  std::vector<unsigned char> plaintext;
+
+  plaintext.push_back(protocol);
+  plaintext.insert(plaintext.end(),
+    reinterpret_cast<unsigned char*>(&len),
+    reinterpret_cast<unsigned char*>(&len) + 4);
+  plaintext.insert(plaintext.end(), buf.begin(), buf.end());
+
+  // 2. 암호화
+  unsigned char iv[16];
+  RAND_bytes(iv, sizeof(iv));
+
+  unsigned char ciphertext[131072];
+  // std::vector<unsigned char> ciphertext;
+  int ciphertext_len;
+
+  if (!aes_encrypt(plaintext.data(), plaintext.size(), key, iv, ciphertext, &ciphertext_len))
+    return -1;
+
+  // 3. 전송 구조: [IV(16)] + [암호문 길이(4)] + [암호문]
+  if(writeNBytes(fd, iv, 16) == -1) return -1;
+  if(writeNBytes(fd, &ciphertext_len, 4) == -1) return -1;
+  if(writeNBytes(fd, ciphertext, ciphertext_len) == -1) return -1;
+
+  return 0;
+}
+
 // 주어진 프로토콜과 데이터(double) 써주는 함수
 int writeData(int fd, uint8_t protocol, double data) {
   uint32_t len = sizeof(data);
@@ -94,6 +125,7 @@ int writeProtocol(int fd, uint8_t protocol) {
 }
 
 uint8_t readEncryptedCommand(int fd) {
+  unsigned char iv[16];
   recv(fd, iv, 16, MSG_WAITALL); // IV 수신
 
   uint32_t ciphertext_len;
@@ -102,16 +134,16 @@ uint8_t readEncryptedCommand(int fd) {
   unsigned char ciphertext[32];
   recv(fd, ciphertext, ciphertext_len, MSG_WAITALL); // 암호문 수신
 
-  unsigned char plaintext[32];
+  unsigned char plaintext[32]; // 평문
   int plaintext_len;
 
-  aes_decrypt(ciphertext, ciphertext_len, key, iv, plaintext, plaintext_len);
-  ciphertext[plaintext_len] = '\0';
+  aes_decrypt(ciphertext, ciphertext_len, key, iv, plaintext, &plaintext_len);
 
   return plaintext[0];
 }
 
 uint8_t readEncryptedCommandNonBlock(int fd) {
+  unsigned char iv[16];
   if (recv(fd, iv, 16, MSG_DONTWAIT) < 0) { // IV 수신
     return ProtocolType::NOTHING;
   }
@@ -125,7 +157,7 @@ uint8_t readEncryptedCommandNonBlock(int fd) {
   unsigned char plaintext[32];
   int plaintext_len;
 
-  aes_decrypt(ciphertext, ciphertext_len, key, iv, plaintext, plaintext_len);
+  aes_decrypt(ciphertext, ciphertext_len, key, iv, plaintext, &plaintext_len);
   ciphertext[plaintext_len] = '\0';
 
   return plaintext[0];
@@ -146,37 +178,9 @@ void writeLog(std::string log) {
   std::cout << "[Server] " << log << std::endl;
 }
 
-bool aes_decrypt(const unsigned char* ciphertext, int ciphertext_len,
-  const unsigned char* key, const unsigned char* iv,
-  unsigned char* plaintext, int& plaintext_len) {
-  EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
-  if (!ctx) return false;
-
-  if (1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), nullptr, key, iv)) {
-    EVP_CIPHER_CTX_free(ctx);
-    return false;
-  }
-
-  int len;
-  if (1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len)) {
-    EVP_CIPHER_CTX_free(ctx);
-    return false;
-  }
-  plaintext_len = len;
-
-  if (1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len)) {
-    EVP_CIPHER_CTX_free(ctx);
-    return false;
-  }
-  plaintext_len += len;
-
-  EVP_CIPHER_CTX_free(ctx);
-  return true;
-}
-
 bool aes_encrypt(const unsigned char* plaintext, int plaintext_len,
   const unsigned char* key, const unsigned char* iv,
-  unsigned char* ciphertext, int& ciphertext_len) {
+  unsigned char* ciphertext, int* ciphertext_len) {
   EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
   if (!ctx) return false;
 
@@ -193,14 +197,42 @@ bool aes_encrypt(const unsigned char* plaintext, int plaintext_len,
     EVP_CIPHER_CTX_free(ctx);
     return false;
   }
-  ciphertext_len = len;
+  *ciphertext_len = len;
 
   // 패딩 처리 및 마무리
   if (1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len)) {
     EVP_CIPHER_CTX_free(ctx);
     return false;
   }
-  ciphertext_len += len;
+  *ciphertext_len += len;
+
+  EVP_CIPHER_CTX_free(ctx);
+  return true;
+}
+
+bool aes_decrypt(const unsigned char* ciphertext, int ciphertext_len,
+  const unsigned char* key, const unsigned char* iv,
+  unsigned char* plaintext, int* plaintext_len) {
+  EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
+  if (!ctx) return false;
+
+  if (1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), nullptr, key, iv)) {
+    EVP_CIPHER_CTX_free(ctx);
+    return false;
+  }
+
+  int len;
+  if (1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len)) {
+    EVP_CIPHER_CTX_free(ctx);
+    return false;
+  }
+  *plaintext_len = len;
+
+  if (1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len)) {
+    EVP_CIPHER_CTX_free(ctx);
+    return false;
+  }
+  *plaintext_len += len;
 
   EVP_CIPHER_CTX_free(ctx);
   return true;

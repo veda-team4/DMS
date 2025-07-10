@@ -83,7 +83,6 @@ int main(void) {
   double thresholdEAR;
   while (true) {
     uint8_t protocol;
-    // readNBytes(client_fd, &protocol, 1);
     protocol = readEncryptedCommand(client_fd);
     if (protocol == ProtocolType::CAMSET) {
       writeLog("message from client: CAMSET");

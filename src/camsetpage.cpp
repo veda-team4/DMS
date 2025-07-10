@@ -56,8 +56,7 @@ int camsetpage() {
     // 클라이언트에 프레임 전송하기
     std::vector<uchar> buf;
     cv::imencode(".jpg", frame, buf);
-    writeLog(std::to_string(buf.size()));
-    if (writeFrame(client_fd, buf) == -1) {
+    if(writeEncryptedFrame(client_fd, buf) == -1) {
       return -1;
     }
   }
