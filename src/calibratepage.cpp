@@ -48,7 +48,7 @@ void CalibratePage::deactivate() {
     socket->readAll();
   }
   buffer.clear();
-  expectedSize = -1;
+  ciphertext_len = -1;
 }
 
 void CalibratePage::moveToNextStep() {
@@ -120,24 +120,45 @@ void CalibratePage::readFrame() {
   buffer.append(socket->readAll());
 
   while (true) {
-    // 아직 명령과 길이까지 못 받았으면 대기
-    if (expectedSize == -1 && buffer.size() >= 5) {
-      // 1바이트 명령 코드 읽기
-      cmd = static_cast<quint8>(buffer[0]);
+    // 단계 1: IV + 길이 수신 대기
+    if (ciphertext_len == -1 && buffer.size() >= 20) {
+      // 16바이트 IV 읽기
+      iv = buffer.left(16);
+      buffer.remove(0, 16);
 
-      // 4바이트 길이 읽기
-      expectedSize = *reinterpret_cast<const quint32*>(buffer.constData() + 1);
-
-      // 명령 1바이트 + 길이 4바이트 제거
-      buffer.remove(0, 5);
+      // 4바이트 암호문 길이 읽기
+      ciphertext_len = *reinterpret_cast<const uint32_t*>(buffer.constData());
+      buffer.remove(0, 4);
     }
 
     // 데이터 길이만큼 수신 완료되었을 때 처리
-    if (expectedSize != -1 && buffer.size() >= expectedSize) {
+    if (ciphertext_len != -1 && buffer.size() >= ciphertext_len) {
+      QByteArray encrypted = buffer.left(ciphertext_len);
+      buffer.remove(0, ciphertext_len);
+      ciphertext_len = -1;
+
+      // 복호화
+      QByteArray decrypted;
+      decrypted.resize(131072);
+      int decrypted_len;
+
+      bool success = aes_decrypt(
+        reinterpret_cast<const unsigned char*>(encrypted.constData()), encrypted.size(),
+        key, reinterpret_cast<const unsigned char*>(iv.constData()),
+        reinterpret_cast<unsigned char*>(decrypted.data()), &decrypted_len
+      );
+
+      if (!success) {
+        writeLog("AES decrypt failed");
+        return;
+      }
+
+      // 복호화된 평문에서 명령과 길이 추출
+      quint8 cmd = static_cast<quint8>(decrypted[0]);
+      quint32 dataLen = *reinterpret_cast<const quint32*>(decrypted.constData() + 1);
+
       if (cmd == ProtocolType::FRAME) {
-        QByteArray imageData = buffer.left(expectedSize);
-        buffer.remove(0, expectedSize);
-        expectedSize = -1;
+        QByteArray imageData = QByteArray::fromRawData(decrypted.constData() + 5, dataLen);
 
         QPixmap pixmap;
         if (pixmap.loadFromData(imageData, "JPG")) {
@@ -147,11 +168,7 @@ void CalibratePage::readFrame() {
         }
       }
       else if (cmd == ProtocolType::OPENEDEAR || cmd == ProtocolType::CLOSEDEAR || cmd == ProtocolType::EARTHRESHOLD) {
-        QByteArray data = buffer.left(expectedSize);
-        buffer.remove(0, expectedSize);
-        expectedSize = -1;
-
-        double value = *reinterpret_cast<const double*>(data.constData());
+        double value = *reinterpret_cast<const double*>(decrypted.constData() + 5);
         if (cmd == ProtocolType::OPENEDEAR) {
           ui->openedVal->setText(QString::number(value));
         }
@@ -164,8 +181,6 @@ void CalibratePage::readFrame() {
       }
       else {
         writeLog("Clear protocol number " + std::to_string(cmd));
-        buffer.remove(0, expectedSize);
-        expectedSize = -1;
       }
     }
     else {

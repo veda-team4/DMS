@@ -27,7 +27,8 @@ private:
   Ui::MonitorPage* ui;
   QLocalSocket* socket;
   QByteArray buffer;
-  int expectedSize = -1;
+  QByteArray iv;
+  int ciphertext_len = -1;
   quint8 cmd;
 
   QTimer* wakeupTimer;

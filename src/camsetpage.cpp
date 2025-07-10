@@ -58,7 +58,7 @@ void CamSetPage::readFrame() {
       bool success = aes_decrypt(
         reinterpret_cast<const unsigned char*>(encrypted.constData()), encrypted.size(),
         key, reinterpret_cast<const unsigned char*>(iv.constData()),
-        reinterpret_cast<unsigned char*>(decrypted.data()), decrypted_len
+        reinterpret_cast<unsigned char*>(decrypted.data()), &decrypted_len
       );
 
       if (!success) {

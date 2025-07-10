@@ -50,7 +50,7 @@ void writeEncryptedCommand(QLocalSocket* socket, uint8_t command) {
   unsigned char ciphertext[32];  // AES 패딩 때문에 16 이상 필요
   int ciphertext_len;
 
-  aes_encrypt(plaintext, 1, key, iv, ciphertext, ciphertext_len);
+  aes_encrypt(plaintext, 1, key, iv, ciphertext, &ciphertext_len);
 
   // 1. IV 전송
   writeNBytes(socket, iv, 16);
@@ -90,7 +90,7 @@ void writeLog(std::string log) {
 
 bool aes_decrypt(const unsigned char* ciphertext, int ciphertext_len,
   const unsigned char* key, const unsigned char* iv,
-  unsigned char* plaintext, int& plaintext_len) {
+  unsigned char* plaintext, int* plaintext_len) {
   EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
   if (!ctx) return false;
 
@@ -104,13 +104,13 @@ bool aes_decrypt(const unsigned char* ciphertext, int ciphertext_len,
     EVP_CIPHER_CTX_free(ctx);
     return false;
   }
-  plaintext_len = len;
+  *plaintext_len = len;
 
   if (1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len)) {
     EVP_CIPHER_CTX_free(ctx);
     return false;
   }
-  plaintext_len += len;
+  *plaintext_len += len;
 
   EVP_CIPHER_CTX_free(ctx);
   return true;
@@ -118,7 +118,7 @@ bool aes_decrypt(const unsigned char* ciphertext, int ciphertext_len,
 
 bool aes_encrypt(const unsigned char* plaintext, int plaintext_len,
   const unsigned char* key, const unsigned char* iv,
-  unsigned char* ciphertext, int& ciphertext_len) {
+  unsigned char* ciphertext, int* ciphertext_len) {
   EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
   if (!ctx) return false;
 
@@ -135,14 +135,14 @@ bool aes_encrypt(const unsigned char* plaintext, int plaintext_len,
     EVP_CIPHER_CTX_free(ctx);
     return false;
   }
-  ciphertext_len = len;
+  *ciphertext_len = len;
 
   // 패딩 처리 및 마무리
   if (1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len)) {
     EVP_CIPHER_CTX_free(ctx);
     return false;
   }
-  ciphertext_len += len;
+  *ciphertext_len += len;
 
   EVP_CIPHER_CTX_free(ctx);
   return true;

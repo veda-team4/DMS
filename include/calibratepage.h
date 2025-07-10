@@ -32,8 +32,9 @@ private:
   Ui::CalibratePage* ui;
   QLocalSocket* socket;
   QByteArray buffer;
+  QByteArray iv;
   QTimer* finishTimer;
-  int expectedSize = -1;
+  int ciphertext_len = -1;
   quint8 cmd;
   void readFrame();
   int clickCount = 0;
