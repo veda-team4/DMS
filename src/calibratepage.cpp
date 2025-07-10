@@ -30,7 +30,7 @@ CalibratePage::~CalibratePage() {
 }
 
 void CalibratePage::activate() {
-  writeProtocol(socket, ProtocolType::CALIBRATE);
+  writeEncryptedCommand(socket, ProtocolType::CALIBRATE);
   connect(socket, &QLocalSocket::readyRead, this, &CalibratePage::readFrame);
   clickCount = 0;
   progressStep = 0;
@@ -42,7 +42,7 @@ void CalibratePage::activate() {
 }
 
 void CalibratePage::deactivate() {
-  writeProtocol(socket, ProtocolType::STOP);
+  writeEncryptedCommand(socket, ProtocolType::STOP);
   disconnect(socket, &QLocalSocket::readyRead, this, &CalibratePage::readFrame);
   while (socket->waitForReadyRead(100) > 0) {
     socket->readAll();
@@ -57,7 +57,7 @@ void CalibratePage::moveToNextStep() {
   double ear;
   switch (clickCount) {
   case 0:
-    writeProtocol(socket, ProtocolType::CALIBRATE_OPENED);
+    writeEncryptedCommand(socket, ProtocolType::CALIBRATE_OPENED);
     ui->nextButton->setEnabled(false);
     ui->previousButton->setEnabled(false);
     ui->infoLabel->setText("뜬 눈 크기 측정중. . . .");
@@ -66,13 +66,13 @@ void CalibratePage::moveToNextStep() {
     finishTimer->start();
     break;
   case 1:
-    writeProtocol(socket, ProtocolType::CALIBRATE_FINISH);
+    writeEncryptedCommand(socket, ProtocolType::CALIBRATE_FINISH);
     ui->nextButton->setEnabled(true);
     ui->previousButton->setEnabled(true);
     ui->infoLabel->setText("감은 눈의 크기를 측정합니다. 준비 완료 시 버튼을 눌러주세요.");
     break;
   case 2:
-    writeProtocol(socket, ProtocolType::CALIBRATE_CLOSED);
+    writeEncryptedCommand(socket, ProtocolType::CALIBRATE_CLOSED);
     ui->nextButton->setEnabled(false);
     ui->previousButton->setEnabled(false);
     ui->infoLabel->setText("감은 눈 크기 측정중. . . .");
@@ -81,7 +81,7 @@ void CalibratePage::moveToNextStep() {
     finishTimer->start();
     break;
   case 3:
-    writeProtocol(socket, ProtocolType::CALIBRATE_FINISH);
+    writeEncryptedCommand(socket, ProtocolType::CALIBRATE_FINISH);
     ui->nextButton->setEnabled(true);
     ui->previousButton->setEnabled(true);
     ui->infoLabel->setText("눈 크기 측정 완료. 시작하려면 버튼을 눌러주세요.");

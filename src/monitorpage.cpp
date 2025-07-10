@@ -36,11 +36,11 @@ MonitorPage::~MonitorPage()
 
 void MonitorPage::activate() {
   connect(socket, &QLocalSocket::readyRead, this, &MonitorPage::readFrame);
-  writeProtocol(socket, ProtocolType::MONITOR);
+  writeEncryptedCommand(socket, ProtocolType::MONITOR);
 }
 
 void MonitorPage::deactivate() {
-  writeProtocol(socket, ProtocolType::STOP);
+  writeEncryptedCommand(socket, ProtocolType::STOP);
   disconnect(socket, &QLocalSocket::readyRead, this, &MonitorPage::readFrame);
   while (socket->waitForReadyRead(100) > 0) {
     socket->readAll();

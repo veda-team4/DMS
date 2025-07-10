@@ -21,7 +21,8 @@ void CamSetPage::activate() {
 }
 
 void CamSetPage::deactivate() {
-  writeProtocol(socket, ProtocolType::STOP);
+  // writeProtocol(socket, ProtocolType::STOP);
+  writeEncryptedCommand(socket, ProtocolType::STOP);
   disconnect(socket, &QLocalSocket::readyRead, this, &CamSetPage::readFrame);
   while (socket->waitForReadyRead(100)) {
     socket->readAll();
