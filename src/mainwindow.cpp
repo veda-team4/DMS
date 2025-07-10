@@ -39,8 +39,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     writeLog("Failed to start server");
   }
 
-  // 서버 소켓과 연결 (10초 동안 연결 시도)
-  constexpr int MAX_RETRY_MS = 10000;
+  // 서버 소켓과 연결 (100초 동안 연결 시도)
+  constexpr int MAX_RETRY_MS = 100000;
   constexpr int INTERVAL_MS = 1000;
   int elapsed = 0;
   while (elapsed < MAX_RETRY_MS) {

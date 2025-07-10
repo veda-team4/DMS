@@ -51,9 +51,12 @@ else()
     endif()
 endif()
 
+# OpenSSL
+find_package(OpenSSL REQUIRED)
+
 target_include_directories(dms_qt PRIVATE include)
 
-target_link_libraries(dms_qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network)
+target_link_libraries(dms_qt PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network OpenSSL::SSL OpenSSL::Crypto)
 
 set_target_properties(dms_qt PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com

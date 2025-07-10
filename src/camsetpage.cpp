@@ -16,7 +16,8 @@ CamSetPage::~CamSetPage() {
 
 void CamSetPage::activate() {
   connect(socket, &QLocalSocket::readyRead, this, &CamSetPage::readFrame);
-  writeProtocol(socket, ProtocolType::CAMSET);
+  // writeProtocol(socket, ProtocolType::CAMSET);
+  writeEncryptedCommand(socket, ProtocolType::CAMSET);
 }
 
 void CamSetPage::deactivate() {
