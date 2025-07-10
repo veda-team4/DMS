@@ -9,7 +9,7 @@
 #include "protocols.h"
 #include "utils.h"
 
-#define SOCKET_PATH "/home/jinhyeok/camera_server/build/.face_socket"
+#define SOCKET_PATH "/home/jinhyeok/dms_server/build/.face_socket"
 
 // ---------------------- 전역 상수 ----------------------
 #define EAR_THRESH_VAL 0.30 // 감은 눈 EAR + (뜬 눈 EAR - 감은 눈 EAR) * X
