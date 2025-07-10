@@ -84,28 +84,28 @@ int main(void) {
   while (true) {
     uint8_t protocol;
     protocol = readEncryptedCommand(client_fd);
-    if (protocol == ProtocolType::CAMSET) {
+    if (protocol == Protocol::CAMSET) {
       writeLog("message from client: CAMSET");
       if (camsetpage() == -1) {
         writeLog("camsetpage error");
         break;
       }
     }
-    else if (protocol == ProtocolType::CALIBRATE) {
+    else if (protocol == Protocol::CALIBRATE) {
       writeLog("message from client: CALIBRATE");
       if (calibratepage(thresholdEAR) == -1) {
         writeLog("calibrate error");
         break;
       }
     }
-    else if (protocol == ProtocolType::MONITOR) {
+    else if (protocol == Protocol::MONITOR) {
       writeLog("message from client: MONITOR");
       if (monitorpage(thresholdEAR) == -1) {
         writeLog("monitor error");
         break;
       }
     }
-    else if (protocol == ProtocolType::STOP) {
+    else if (protocol == Protocol::STOP) {
       break;
     }
   }

@@ -12,26 +12,28 @@
 이후에는 Data가 전송된다
 
 서버 <- 클라이언트 프로토콜은 아래와 같다.
-[Type(1byte)]
+[Command(1byte)]
 
 protocols.h 에는 첫 1바이트에 해당하는 Type 을 정의한다
 */
 
-namespace ProtocolType {
+namespace Protocol {
   enum Type : uint8_t {
+    // SERVER <- CLIENT [COMMAND]
     CAMSET,
     CALIBRATE,
     CALIBRATE_OPENED,
     CALIBRATE_CLOSED,
+    CALIBRATE_FINISH,
+    MONITOR,
+    STOP,
+    NOTHING,
+    // SERVER -> CLIENT [TYPE]
     OPENEDEAR,
     CLOSEDEAR,
     EARTHRESHOLD,
-    CALIBRATE_FINISH,
-    MONITOR,
     EYECLOSEDRATIO,
-    FRAME,
-    STOP,
-    NOTHING
+    FRAME
   };
 }
 

@@ -20,26 +20,26 @@ int calibratepage(double& thresholdEAR) {
   while (true) {
     uint8_t protocol;
     protocol = readEncryptedCommandNonBlock(client_fd);
-    if (protocol != ProtocolType::NOTHING) {
-      if (protocol == ProtocolType::CALIBRATE_OPENED) {
+    if (protocol != Protocol::NOTHING) {
+      if (protocol == Protocol::CALIBRATE_OPENED) {
         writeLog("message from client: CALIBRATE_OPENED");
         calibrateEyes(openedEAR, true);
       }
-      else if (protocol == ProtocolType::CALIBRATE_CLOSED) {
+      else if (protocol == Protocol::CALIBRATE_CLOSED) {
         writeLog("message from client: CALIBRATE_CLOSED");
         calibrateEyes(closedEAR, false);
         // EAR threshold 값 계산
         thresholdEAR = closedEAR + (openedEAR - closedEAR) * EAR_THRESH_VAL;
 
         // 클라이언트에 EAR threshold 값 전송하기
-        uint8_t protocol = ProtocolType::EARTHRESHOLD;
+        uint8_t protocol = Protocol::EARTHRESHOLD;
         if (writeEncryptedData(client_fd, protocol, thresholdEAR) == -1) return -1;
 
         writeLog(std::string("Opened: " + std::to_string(openedEAR)));
         writeLog(std::string("Closed: " + std::to_string(closedEAR)));
         writeLog(std::string("Threshold: ") + std::to_string(thresholdEAR));
       }
-      else if (protocol == ProtocolType::STOP) {
+      else if (protocol == Protocol::STOP) {
         writeLog("message from client: STOP");
         return 0;
       }
@@ -108,9 +108,9 @@ int calibrateEyes(double& ear, bool opened) {
   while (true) {
     uint8_t protocol;
     protocol = readEncryptedCommandNonBlock(client_fd);
-    if (protocol != ProtocolType::NOTHING) {
+    if (protocol != Protocol::NOTHING) {
       // 클라이언트 측으로부터 finish 수신 시 while 문 빠져나감
-      if (protocol == ProtocolType::CALIBRATE_FINISH) {
+      if (protocol == Protocol::CALIBRATE_FINISH) {
         writeLog("message from client: CALIBRATE_FINISH");
         break;
       }
@@ -174,7 +174,7 @@ int calibrateEyes(double& ear, bool opened) {
   ear = earSum / earCount;
 
   // 클라이언트에 EAR 값 전송하기
-  uint8_t protocol = (opened ? ProtocolType::OPENEDEAR : ProtocolType::CLOSEDEAR);
+  uint8_t protocol = (opened ? Protocol::OPENEDEAR : Protocol::CLOSEDEAR);
   uint32_t size = sizeof(ear);
   if (writeEncryptedData(client_fd, protocol, ear) == -1) return -1;
 

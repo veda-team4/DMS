@@ -25,8 +25,8 @@ int monitorpage(double thresholdEAR) {
     // 클라이언트 측으로부터 "stop" 수신 시 종료
     uint8_t protocol;
     protocol = readEncryptedCommandNonBlock(client_fd);
-    if (protocol != ProtocolType::NOTHING) {
-      if (protocol == ProtocolType::STOP) {
+    if (protocol != Protocol::NOTHING) {
+      if (protocol == Protocol::STOP) {
         writeLog("message from client: STOP");
         return 0;
       }
@@ -125,7 +125,7 @@ int monitorpage(double thresholdEAR) {
     }
 
     // 눈 감김 비율 전송
-    protocol = ProtocolType::EYECLOSEDRATIO;
+    protocol = Protocol::EYECLOSEDRATIO;
     if (writeEncryptedData(client_fd, protocol, eyeClosedRatio) == -1) {
       return -1;
     }

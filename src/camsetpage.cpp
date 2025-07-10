@@ -16,8 +16,8 @@ int camsetpage() {
     // 클라이언트 측으로부터 STOP 프로토콜 수신 시 종료
     uint8_t protocol;
     protocol = readEncryptedCommandNonBlock(client_fd);
-    if (protocol != ProtocolType::NOTHING) {
-      if (protocol == ProtocolType::STOP) {
+    if (protocol != Protocol::NOTHING) {
+      if (protocol == Protocol::STOP) {
         writeLog(std::string("message from client: STOP"));
         return 0;
       }

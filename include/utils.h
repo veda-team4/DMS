@@ -7,17 +7,31 @@
 #include <dlib/opencv.h>
 #include <vector>
 
-int readNBytes(int fd, void* buf, int len);
-int writeNBytes(int fd, const void* buf, int len);
-int writeFrame(int fd, const std::vector<uchar>& buf);
-int writeData(int fd, uint8_t protocol, double data);
-int writeProtocol(int fd, uint8_t protocol);
-uint8_t readEncryptedCommand(int fd);
-uint8_t readEncryptedCommandNonBlock(int fd);
-int writeEncryptedFrame(int fd, const std::vector<uchar>& buf);
-int writeEncryptedData(int fd, uint8_t protocol, double data);
+// ************************ 편의 기능 함수 ************************
+// 눈 랜드마크 이용해서 EAR (Eye Aspect Ratio) 계산해서 반환하는 함수
 double computeEAR(const dlib::full_object_detection& s, int idx);
+// 로그 출력 함수
 void writeLog(std::string log);
+// ****************************************************************
+
+// ********************* 소켓 입출력 함수 *************************
+// fd와 연결된 소켓으로부터 암호화된 1바이트 명령어 읽은 후 반환하는 함수
+uint8_t readEncryptedCommand(int fd);
+// fd와 연결된 소켓으로부터 암호화된 1바이트 명령어 논블로킹으로 읽은 후 반환하는 함수
+uint8_t readEncryptedCommandNonBlock(int fd);
+// fd와 연결된 소켓에 buf에 저장된 데이터 len 바이트를 써주는 함수
+int writeNBytes(int fd, const void* buf, int len);
+// fd와 연결된 소켓에 buf에 저장된 프레임 데이터를 암호화 하여 써주는 함수
+int writeEncryptedFrame(int fd, const std::vector<uchar>& buf);
+// fd와 연결된 소켓에 double 데이터를 암호화하여 써주는 함수
+int writeEncryptedData(int fd, uint8_t protocol, double data);
+// ****************************************************************
+
+// ************* OpenSSL 이용한 암호화, 복호화 함수 *****************
+// aes256_cbc 방식으로 암호화 하는 함수
 bool aes_encrypt(const unsigned char* plaintext, int plaintext_len, const unsigned char* key, const unsigned char* iv, unsigned char* ciphertext, int* ciphertext_len);
+// aes256_cbc 방식으로 복호화 하는 함수
 bool aes_decrypt(const unsigned char* ciphertext, int ciphertext_len, const unsigned char* key, const unsigned char* iv, unsigned char* plaintext, int* plaintext_len);
+// ****************************************************************
+
 #endif // UTILS_H
