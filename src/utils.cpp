@@ -86,7 +86,6 @@ int writeEncryptedFrame(int fd, const std::vector<uchar>& buf) {
   RAND_bytes(iv, sizeof(iv));
 
   unsigned char ciphertext[131072];
-  // std::vector<unsigned char> ciphertext;
   int ciphertext_len;
 
   if (!aes_encrypt(plaintext.data(), plaintext.size(), key, iv, ciphertext, &ciphertext_len))
@@ -125,6 +124,26 @@ int writeEncryptedData(int fd, uint8_t protocol, double data) {
   if(writeNBytes(fd, iv, 16) == -1) return -1;
   if(writeNBytes(fd, &ciphertext_len, 4) == -1) return -1;
   if(writeNBytes(fd, ciphertext, ciphertext_len) == -1) return -1;
+
+  return 0;
+}
+
+int writeEncryptedCommand(int fd, uint8_t command) {
+  unsigned char iv[16];
+  RAND_bytes(iv, sizeof(iv));  // 무작위 IV 생성
+
+  // 평문 명령 1바이트 준비
+  unsigned char plaintext[1] = { command };
+
+  unsigned char ciphertext[64];
+  int ciphertext_len;
+
+  aes_encrypt(plaintext, 1, key, iv, ciphertext, &ciphertext_len);
+
+  // 전송 구조: [IV(16)] + [암호문 길이(4)] + [암호문]
+  if (writeNBytes(fd, iv, 16) == -1) return -1;
+  if (writeNBytes(fd, &ciphertext_len, 4) == -1) return -1;
+  if (writeNBytes(fd, ciphertext, ciphertext_len) == -1) return -1;
 
   return 0;
 }

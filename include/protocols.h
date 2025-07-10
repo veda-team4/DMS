@@ -4,17 +4,15 @@
 /*
 통신 간에 사용할 프로토콜 정의
 
-서버 -> 클라이언트 프로토콜은 아래와 같다
-[Type(1byte)][Len(4byte)][Data]
+프로토콜은 두 가지 유형이 잇다.
 
-첫 1바이트는 프로토콜 타입을,
-이후 4바이트는 Data의 byte 크기를
-이후에는 Data가 전송된다
+1. [Type(1byte)][Len(4byte)][Data]
+  -> 데이터를 송신해야 할 때 사용
 
-서버 <- 클라이언트 프로토콜은 아래와 같다.
-[Command(1byte)]
+2. [Command(1byte)]
+  -> 명령 / 특정 상황 발생 알림 송신해야 할 때 사용
 
-protocols.h 에는 첫 1바이트에 해당하는 Type 을 정의한다
+protocols.h 에는 첫 1바이트에 해당하는 Type / Command 를 정의한다
 */
 
 namespace Protocol {
@@ -33,7 +31,9 @@ namespace Protocol {
     CLOSEDEAR,
     EARTHRESHOLD,
     EYECLOSEDRATIO,
-    FRAME
+    FRAME,
+    // SERVER -> CLIENT [COMMAND]
+    HEADDROPPED
   };
 }
 

@@ -99,9 +99,9 @@ int monitorpage(double thresholdEAR) {
       bool isClosed = (earAvg < thresholdEAR);
       if (isClosed) {
         ++closedCount;
-        cv::putText(frame, "Eye Closed!!!!",
+        cv::putText(frame, "CLOSED",
           cv::Point(faceRect.left(), faceRect.top() - 10),
-          cv::FONT_HERSHEY_SIMPLEX, 0.9,
+          cv::FONT_HERSHEY_SIMPLEX, 1.0,
           cv::Scalar(0, 0, 255), 2);
       }
 
@@ -131,10 +131,10 @@ int monitorpage(double thresholdEAR) {
     }
 
     // 머리 떨어짐 감지 및 출력
-    static unsigned long long i = 0;
     if (downCount >= MAX_DOWN_COUNT) {
-      std::cout << "HEAD DROPPED !!! " << i++ << std::endl;
-      cv::putText(frame, "HEADDROPPED !!!", cv::Point(faceRect.left(), faceRect.top() - 70), cv::FONT_HERSHEY_SIMPLEX, 0.9, cv::Scalar(0, 0, 255), 2);
+      if (writeEncryptedCommand(client_fd, Protocol::HEADDROPPED) == -1) {
+        return -1;
+      }
     }
 
     // 클라이언트에 프레임 전송하기
