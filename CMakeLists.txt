@@ -22,6 +22,9 @@ set_target_properties(dlib PROPERTIES
     IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/library/libdlib.a
 )
 
+# OpenSSL
+find_package(OpenSSL REQUIRED)
+
 # Main executable
 add_executable(camera_server
  src/main.cpp
@@ -32,4 +35,4 @@ add_executable(camera_server
  src/monitorpage.cpp
  )
 
-target_link_libraries(camera_server ${OpenCV_LIBS} dlib)
+target_link_libraries(camera_server ${OpenCV_LIBS} dlib OpenSSL::SSL OpenSSL::Crypto)
