@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(camera_server)
+project(dms_server)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Release)
@@ -26,7 +26,7 @@ set_target_properties(dlib PROPERTIES
 find_package(OpenSSL REQUIRED)
 
 # Main executable
-add_executable(camera_server
+add_executable(dms_server
  src/main.cpp
  src/utils.cpp
  src/threads.cpp
@@ -35,4 +35,4 @@ add_executable(camera_server
  src/monitorpage.cpp
  )
 
-target_link_libraries(camera_server ${OpenCV_LIBS} dlib OpenSSL::SSL OpenSSL::Crypto)
+target_link_libraries(dms_server ${OpenCV_LIBS} dlib OpenSSL::SSL OpenSSL::Crypto)
