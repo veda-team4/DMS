@@ -15,6 +15,7 @@ int writeProtocol(int fd, uint8_t protocol);
 uint8_t readEncryptedCommand(int fd);
 uint8_t readEncryptedCommandNonBlock(int fd);
 int writeEncryptedFrame(int fd, const std::vector<uchar>& buf);
+int writeEncryptedData(int fd, uint8_t protocol, double data);
 double computeEAR(const dlib::full_object_detection& s, int idx);
 void writeLog(std::string log);
 bool aes_encrypt(const unsigned char* plaintext, int plaintext_len, const unsigned char* key, const unsigned char* iv, unsigned char* ciphertext, int* ciphertext_len);

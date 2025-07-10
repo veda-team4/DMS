@@ -110,12 +110,33 @@ int writeEncryptedFrame(int fd, const std::vector<uchar>& buf) {
   return 0;
 }
 
-// 주어진 프로토콜과 데이터(double) 써주는 함수
-int writeData(int fd, uint8_t protocol, double data) {
+// 주어진 프로토콜과 데이터(double) 암호화해서 써주는 함수
+int writeEncryptedData(int fd, uint8_t protocol, double data) {
+  // 1. 평문 만들기: protocol + len + double data
   uint32_t len = sizeof(data);
-  if (writeNBytes(fd, &protocol, 1) == -1) return -1;
-  if (writeNBytes(fd, &len, 4) == -1) return -1;
-  if (writeNBytes(fd, &data, len) == -1) return -1;
+  std::vector<unsigned char> plaintext;
+
+  plaintext.push_back(protocol);
+  plaintext.insert(plaintext.end(), reinterpret_cast<unsigned char*>(&len),
+    reinterpret_cast<unsigned char*>(&len) + 4);
+  plaintext.insert(plaintext.end(), reinterpret_cast<unsigned char*>(&data),
+    reinterpret_cast<unsigned char*>(&data) + len);
+
+  // 2. 암호화
+  unsigned char iv[16];
+  RAND_bytes(iv, sizeof(iv));
+
+  unsigned char ciphertext[64];
+  int ciphertext_len;
+
+  if (!aes_encrypt(plaintext.data(), plaintext.size(), key, iv, ciphertext, &ciphertext_len))
+    return -1;
+
+  // 3. 전송 구조: [IV(16)] + [암호문 길이(4)] + [암호문]
+  if(writeNBytes(fd, iv, 16) == -1) return -1;
+  if(writeNBytes(fd, &ciphertext_len, 4) == -1) return -1;
+  if(writeNBytes(fd, ciphertext, ciphertext_len) == -1) return -1;
+
   return 0;
 }
 

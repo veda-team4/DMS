@@ -126,7 +126,7 @@ int monitorpage(double thresholdEAR) {
 
     // 눈 감김 비율 전송
     protocol = ProtocolType::EYECLOSEDRATIO;
-    if (writeData(client_fd, protocol, eyeClosedRatio) == -1) {
+    if (writeEncryptedData(client_fd, protocol, eyeClosedRatio) == -1) {
       return -1;
     }
 
@@ -140,7 +140,7 @@ int monitorpage(double thresholdEAR) {
     // 클라이언트에 프레임 전송하기
     std::vector<uchar> buf;
     cv::imencode(".jpg", frame, buf);
-    if (writeFrame(client_fd, buf) == -1) {
+    if (writeEncryptedFrame(client_fd, buf) == -1) {
       return -1;
     }
   }
