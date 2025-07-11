@@ -37,16 +37,19 @@ int server_fd, client_fd; // 서버, 클라이언트 소켓 파일 디스크립�
 // --------------------------------------------------------
 
 int main(void) {
+  // 0. 소켓 PATH 설정
   char SOCKET_PATH[128] = {0, };
   strcpy(SOCKET_PATH, getenv("HOME"));
   strcat(SOCKET_PATH, "/.dms_unix_socket");
-  // 0. UNIX Domain Socket 생성
+
+  // 1. UNIX Domain Socket 생성
   server_fd = socket(AF_UNIX, SOCK_STREAM, 0);
   if (server_fd < 0) {
     perror("socket()");
     return -1;
   }
-  // 1. 소켓 - 주소 연결
+
+  // 2. 소켓 - 주소 연결
   sockaddr_un addr;
   memset(&addr, 0, sizeof(addr));
   addr.sun_family = AF_UNIX;
@@ -58,11 +61,11 @@ int main(void) {
     return -1;
   }
 
-  // 2. 클라이언트 연결 대기
+  // 3. 클라이언트 연결 대기
   listen(server_fd, 1);
   writeLog("Waiting for client ....");
 
-  // 3. 클라이언트 연결
+  // 4. 클라이언트 연결
   client_fd = accept(server_fd, NULL, NULL);
   if (client_fd < 0) {
     perror("accept");
@@ -70,17 +73,17 @@ int main(void) {
   }
   writeLog("Client connected !");
 
-  // 4. 카메라 열기
+  // 5. 카메라 열기
   cap.open(0, cv::CAP_V4L2);
   if (!cap.isOpened()) {
     writeLog("Camera open failed");
     return -1;
   }
 
-  // 5. 얼굴 탐지 쓰레드 생성
+  // 6. 얼굴 탐지 쓰레드 생성
   std::thread faceThread(runFaceDetectionThread);
 
-  // 6. 루프 돌며 클라이언트로부터 명령 받아서 실행
+  // 7. 루프 돌며 클라이언트로부터 명령 받아서 실행
   double thresholdEAR;
   while (true) {
     uint8_t protocol;
