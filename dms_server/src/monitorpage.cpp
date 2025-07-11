@@ -102,7 +102,7 @@ int monitorpage(double thresholdEAR) {
         cv::putText(frame, "CLOSED",
           cv::Point(faceRect.left(), faceRect.top() - 10),
           cv::FONT_HERSHEY_SIMPLEX, 1.0,
-          cv::Scalar(0, 0, 255), 2);
+          cv::Scalar(255, 0, 0), 2);
       }
 
       // { 현재 시간, 눈 감음 여부} 기록
