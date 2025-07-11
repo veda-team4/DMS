@@ -5,7 +5,7 @@
 void runFaceDetectionThread() {
   // 얼굴 및 랜드마크 검출 객체 할당
   dlib::frontal_face_detector detector = dlib::get_frontal_face_detector();
-  dlib::deserialize("../model/shape_predictor_68_face_landmarks.dat") >> sp;
+  dlib::deserialize("../../dms_server/model/shape_predictor_68_face_landmarks.dat") >> sp;
 
   // 반복문 돌며 얼굴 검출하기
   while (running) {

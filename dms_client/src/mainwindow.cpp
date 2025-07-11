@@ -30,9 +30,12 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     std::cout << output.toStdString();
     });
 
+  char HOME[128] = {0, };
+  strcpy(HOME, getenv("HOME"));
+
   // 서버 프로세스 실행
-  serverProcess->setWorkingDirectory(SERVER_PATH);
-  serverProcess->start(QString(SERVER_PATH) + QString("/dms_server"), QStringList());
+  serverProcess->setWorkingDirectory(QString(HOME) + QString("/dms/build/dms_server"));
+  serverProcess->start(QString(HOME) + QString("/dms/build/dms_server/dms_server"), QStringList());
 
   // 서버 프로세스 실행 기다림
   if (!serverProcess->waitForStarted(50000)) {
@@ -44,9 +47,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
   constexpr int INTERVAL_MS = 1000;
   int elapsed = 0;
   while (elapsed < MAX_RETRY_MS) {
-    socket->connectToServer(SOCKET_PATH);
+    socket->connectToServer(QString(HOME) + QString("/.dms_unix_socket"));
     if (socket->state() == QLocalSocket::ConnectedState) {
-      writeLog("Server connected.");
+      writeLog("Server socket connected.");
       break;
     }
     socket->abort();  // 실패한 연결 정리

@@ -13,9 +13,6 @@
 #include "monitorpage.h"
 #include "basepage.h"
 
-#define SERVER_PATH "/home/jinhyeok/dms_server/build"
-#define SOCKET_PATH "/home/jinhyeok/dms_server/build/.face_socket"
-
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE

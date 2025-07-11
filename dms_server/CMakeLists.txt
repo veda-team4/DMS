@@ -9,17 +9,17 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_compile_options(-Wno-psabi)
 
 # include directory
-include_directories(${CMAKE_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # OpenCV
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 # Dlib
-include_directories(${CMAKE_SOURCE_DIR}/include/dlib ${CMAKE_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/dlib ${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_library(dlib STATIC IMPORTED)
 set_target_properties(dlib PROPERTIES
-    IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/library/libdlib.a
+    IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/library/libdlib.a
 )
 
 # OpenSSL

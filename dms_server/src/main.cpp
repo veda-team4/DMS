@@ -9,8 +9,6 @@
 #include "protocols.h"
 #include "utils.h"
 
-#define SOCKET_PATH "/home/jinhyeok/dms_server/build/.face_socket"
-
 // ---------------------- 전역 상수 ----------------------
 #define EAR_THRESH_VAL 0.30 // 감은 눈 EAR + (뜬 눈 EAR - 감은 눈 EAR) * X
 #define BLINK_RATIO_THRESH 0.6 // 눈 감은 비율 임계값
@@ -39,6 +37,9 @@ int server_fd, client_fd; // 서버, 클라이언트 소켓 파일 디스크립�
 // --------------------------------------------------------
 
 int main(void) {
+  char SOCKET_PATH[128] = {0, };
+  strcpy(SOCKET_PATH, getenv("HOME"));
+  strcat(SOCKET_PATH, "/.dms_unix_socket");
   // 0. UNIX Domain Socket 생성
   server_fd = socket(AF_UNIX, SOCK_STREAM, 0);
   if (server_fd < 0) {
