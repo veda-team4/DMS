@@ -19,3 +19,6 @@ sudo modprobe bcm2835-v4l2
 /etc/modules 마지막줄에 bcm2835-v4l2 추가하면 부팅시 자동 로드된다.
 
 ffplay /dev/video0 으로 영상 출력 확인할 수 있다.
+
+2. OpenSSL 설치
+sudo apt-get install libssl-dev
