@@ -11,9 +11,13 @@
 #include "protocols.h"
 #include "utils.h"
 
+// ********** 눈 크기 감지 관련 상수 **********
+#define EAR_THRESH_VAL 0.30 // 감은 눈 EAR + (뜬 눈 EAR - 감은 눈 EAR) * X
+// *******************************************
+
 int calibrateEyes(double& ear, bool opened);
 
-int calibratepage(double& thresholdEAR) {
+int calibratepage(double* thresholdEAR) {
   // 뜬 눈 EAR, 감은 눈 EAR
   double openedEAR, closedEAR;
 
@@ -29,15 +33,15 @@ int calibratepage(double& thresholdEAR) {
         writeLog("message from client: CALIBRATE_CLOSED");
         calibrateEyes(closedEAR, false);
         // EAR threshold 값 계산
-        thresholdEAR = closedEAR + (openedEAR - closedEAR) * EAR_THRESH_VAL;
+        *thresholdEAR = closedEAR + (openedEAR - closedEAR) * EAR_THRESH_VAL;
 
         // 클라이언트에 EAR threshold 값 전송하기
         uint8_t protocol = Protocol::EARTHRESHOLD;
-        if (writeEncryptedData(client_fd, protocol, thresholdEAR) == -1) return -1;
+        if (writeEncryptedData(client_fd, protocol, *thresholdEAR) == -1) return -1;
 
         writeLog(std::string("Opened: " + std::to_string(openedEAR)));
         writeLog(std::string("Closed: " + std::to_string(closedEAR)));
-        writeLog(std::string("Threshold: ") + std::to_string(thresholdEAR));
+        writeLog(std::string("Threshold: ") + std::to_string(*thresholdEAR));
       }
       else if (protocol == Protocol::STOP) {
         writeLog("message from client: STOP");
@@ -86,6 +90,28 @@ int calibratepage(double& thresholdEAR) {
       for (int i = 0; i < landmarkIdx.size(); ++i) {
         dlib::point p = landmarks.part(landmarkIdx[i]);
         cv::circle(frame, cv::Point(p.x(), p.y()), 2, cv::Scalar(255, 0, 0), -1);
+      }
+    }
+
+    {
+      std::lock_guard<std::mutex> lock(timeMutex);
+      if (std::chrono::duration_cast<std::chrono::milliseconds>(rightTime - lastRightTime).count() > 0) {
+        writeLog("Gesture: RIGHT");
+        lastRightTime = rightTime;
+        if (writeEncryptedCommand(client_fd, Protocol::RIGHT) == -1) {
+          return -1;
+        }
+      }
+    }
+
+    {
+      std::lock_guard<std::mutex> lock(timeMutex);
+      if (std::chrono::duration_cast<std::chrono::milliseconds>(leftTime - lastLeftTime).count() > 0) {
+        writeLog("Gesture: LEFT");
+        lastLeftTime = leftTime;
+        if (writeEncryptedCommand(client_fd, Protocol::LEFT) == -1) {
+          return -1;
+        }
       }
     }
 

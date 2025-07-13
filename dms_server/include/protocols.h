@@ -18,6 +18,7 @@ protocols.h 에는 첫 1바이트에 해당하는 Type / Command 를 정의한�
 namespace Protocol {
   enum Type : uint8_t {
     // SERVER <- CLIENT [COMMAND]
+    STARTPAGE,
     CAMSET,
     CALIBRATE,
     CALIBRATE_OPENED,
@@ -33,7 +34,10 @@ namespace Protocol {
     EYECLOSEDRATIO,
     FRAME,
     // SERVER -> CLIENT [COMMAND]
-    HEADDROPPED
+    HEADDROPPED,
+    LEFT,
+    RIGHT,
+    PAUSE
   };
 }
 

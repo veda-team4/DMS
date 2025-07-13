@@ -99,6 +99,11 @@ void MonitorPage::readFrame() {
         return;
       }
 
+      if (cmd == Protocol::LEFT) {
+        ui->previousButton->click();
+        return;
+      }
+
       quint32 dataLen = *reinterpret_cast<const quint32*>(decrypted.constData() + 1);
 
       if (cmd == Protocol::FRAME) {

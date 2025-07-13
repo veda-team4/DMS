@@ -15,13 +15,13 @@ CamSetPage::~CamSetPage() {
 }
 
 void CamSetPage::activate() {
-  connect(socket, &QLocalSocket::readyRead, this, &CamSetPage::readFrame);
+  connect(socket, &QLocalSocket::readyRead, this, &CamSetPage::readSocket);
   writeEncryptedCommand(socket, Protocol::CAMSET);
 }
 
 void CamSetPage::deactivate() {
   writeEncryptedCommand(socket, Protocol::STOP);
-  disconnect(socket, &QLocalSocket::readyRead, this, &CamSetPage::readFrame);
+  disconnect(socket, &QLocalSocket::readyRead, this, &CamSetPage::readSocket);
   while (socket->waitForReadyRead(100)) {
     socket->readAll();
   }
@@ -29,7 +29,7 @@ void CamSetPage::deactivate() {
   ciphertext_len = -1;
 }
 
-void CamSetPage::readFrame() {
+void CamSetPage::readSocket() {
   buffer.append(socket->readAll());
 
   while (true) {
@@ -68,6 +68,16 @@ void CamSetPage::readFrame() {
 
       // 복호화된 평문에서 명령과 길이 추출
       quint8 cmd = static_cast<quint8>(decrypted[0]);
+
+      if (cmd == Protocol::RIGHT) {
+        ui->nextButton->click();
+        return;
+      }
+      else if (cmd == Protocol::LEFT) {
+        ui->previousButton->click();
+        return;
+      }
+
       quint32 dataLen = *reinterpret_cast<const quint32*>(decrypted.constData() + 1);
 
       if (cmd == Protocol::FRAME) {

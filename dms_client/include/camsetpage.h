@@ -28,7 +28,7 @@ private:
   QByteArray iv;
   int ciphertext_len = -1;
   quint8 cmd;
-  void readFrame();
+  void readSocket();
 };
 
 #endif // CAMSETPAGE_H

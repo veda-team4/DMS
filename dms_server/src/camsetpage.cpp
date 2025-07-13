@@ -53,10 +53,32 @@ int camsetpage() {
         cv::Scalar(0, 255, 0), 2);
     }
 
+    {
+      std::lock_guard<std::mutex> lock(timeMutex);
+      if (std::chrono::duration_cast<std::chrono::milliseconds>(rightTime - lastRightTime).count() > 0) {
+        writeLog("Gesture: RIGHT");
+        lastRightTime = rightTime;
+        if (writeEncryptedCommand(client_fd, Protocol::RIGHT) == -1) {
+          return -1;
+        }
+      }
+    }
+
+    {
+      std::lock_guard<std::mutex> lock(timeMutex);
+      if (std::chrono::duration_cast<std::chrono::milliseconds>(leftTime - lastLeftTime).count() > 0) {
+        writeLog("Gesture: LEFT");
+        lastLeftTime = leftTime;
+        if (writeEncryptedCommand(client_fd, Protocol::LEFT) == -1) {
+          return -1;
+        }
+      }
+    }
+
     // 클라이언트에 프레임 전송하기
     std::vector<uchar> buf;
     cv::imencode(".jpg", frame, buf);
-    if(writeEncryptedFrame(client_fd, buf) == -1) {
+    if (writeEncryptedFrame(client_fd, buf) == -1) {
       return -1;
     }
   }

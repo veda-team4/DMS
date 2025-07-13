@@ -63,7 +63,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
   }
 
   // 페이지 생성
-  startPage = new StartPage(nullptr);
+  startPage = new StartPage(nullptr, socket);
   camSetPage = new CamSetPage(nullptr, socket);
   calibratePage = new CalibratePage(nullptr, socket);
   monitorPage = new MonitorPage(nullptr, socket);
@@ -73,7 +73,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
   ui->stackedWidget->addWidget(camSetPage);
   ui->stackedWidget->addWidget(calibratePage);
   ui->stackedWidget->addWidget(monitorPage);
-  ui->stackedWidget->setCurrentWidget(startPage);
 
   // 각 페이지에서 버튼 클릭 시 다음 또는 이전 페이지로 이동할 수 있도록 설정
   connect(startPage, &StartPage::moveToNext, this, &MainWindow::showCamSetPage);
@@ -85,6 +84,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
   connect(calibratePage, &CalibratePage::moveToPrevious, this, &MainWindow::showCamSetPage);
 
   connect(monitorPage, &MonitorPage::moveToPrevious, this, &MainWindow::showCalibratePage);
+
+  ui->stackedWidget->setCurrentWidget(startPage);
+  startPage->activate();
 }
 
 MainWindow::~MainWindow() {
@@ -134,6 +136,7 @@ void MainWindow::showStartPage() {
     prev->deactivate();
   }
   ui->stackedWidget->setCurrentWidget(startPage);
+  startPage->activate();
 }
 
 void MainWindow::showCamSetPage() {

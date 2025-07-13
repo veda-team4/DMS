@@ -11,6 +11,14 @@
 #include "utils.h"
 #include "protocols.h"
 
+// ********** 눈 감김 감지 관련 상수 **********
+#define BLINK_WINDOW_MS 2000 // 분석 시간 윈도우 (2초)
+#define INCREASE_THRESH  2.0 // 고개 움직임 감지 최소 값
+#define INCREASE_THRESH2 0.1 // 고개 움직임 미감지 최대 값 (이 값보다 적게 아래로 내려가면 떨어짐 아님)
+#define INCREASE_TIME 0.3 // 고개 움직임 감지 최대 시간 값
+#define MAX_DOWN_COUNT 5 // 몇번 카운트 해야 경고할 것인지
+// ********************************************
+
 int monitorpage(double thresholdEAR) {
   // 눈 감음 정보 저장 변수
   std::deque<std::pair<std::chrono::steady_clock::time_point, bool>> blinkHistory;
@@ -134,6 +142,17 @@ int monitorpage(double thresholdEAR) {
     if (downCount >= MAX_DOWN_COUNT) {
       if (writeEncryptedCommand(client_fd, Protocol::HEADDROPPED) == -1) {
         return -1;
+      }
+    }
+
+    {
+      std::lock_guard<std::mutex> lock(timeMutex);
+      if (std::chrono::duration_cast<std::chrono::milliseconds>(leftTime - lastLeftTime).count() > 0) {
+        writeLog("Gesture: LEFT");
+        lastLeftTime = leftTime;
+        if (writeEncryptedCommand(client_fd, Protocol::LEFT) == -1) {
+          return -1;
+        }
       }
     }
 
