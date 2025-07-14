@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <QApplication>
 #include "mainwindow.h"
+#include "led.h"
 
 unsigned char key[33] = "abcdefghijklmnopqrstuvwxyz012345";
 
