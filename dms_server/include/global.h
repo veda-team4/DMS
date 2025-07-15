@@ -24,6 +24,8 @@ extern std::chrono::time_point<std::chrono::steady_clock> lastLeftTime, lastRigh
 extern std::chrono::time_point<std::chrono::steady_clock> leftTime, rightTime, stretchTime;
 extern std::mutex timeMutex;
 
+extern bool gestureLock;
+
 extern int server_fd, client_fd; // 서버, 클라이언트 소켓 파일 디스크립터
 // --------------------------------------------------------
 

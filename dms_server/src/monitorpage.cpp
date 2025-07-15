@@ -38,6 +38,14 @@ int monitorpage(double thresholdEAR) {
         writeLog("message from client: STOP");
         return 0;
       }
+      else if (protocol == Protocol::LOCK) {
+        writeLog(std::string("message from client: LOCK"));
+        gestureLock = true;
+      }
+      else if (protocol == Protocol::UNLOCK) {
+        writeLog(std::string("message from client: UNLOCK"));
+        gestureLock = false;
+      }
       else {
         return -1;
       }

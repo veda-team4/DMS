@@ -76,12 +76,6 @@ void runGestureDetectionThread() {
   // 시간 값 초기화
   std::chrono::time_point<std::chrono::steady_clock> latestTime;
   latestTime = std::chrono::steady_clock::now();
-  /*
-  {
-    std::lock_guard<std::mutex> lock(frameMutex);
-    leftTime = rightTime = stretchTime = latestTime = std::chrono::steady_clock::now();
-  }
-  */
 
   // 최초 프레임 값 할당
   while (running) {
@@ -145,6 +139,11 @@ void runGestureDetectionThread() {
           continue;
       }
       stretchScore = 0;
+    }
+
+    if (gestureLock) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(30));
+      continue;
     }
 
     // 현재 프레임과 이전 프레임의 차이의 절댓값 갖는 프레임 계산

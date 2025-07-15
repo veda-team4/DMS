@@ -165,7 +165,14 @@ void CalibratePage::readFrame() {
         return;
       }
       else if (cmd == Protocol::STRETCH) {
-        gestureLock = !gestureLock;
+        if (gestureLock) {
+          gestureLock = false;
+          writeEncryptedCommand(socket, Protocol::UNLOCK);
+        }
+        else {
+          gestureLock = true;
+          writeEncryptedCommand(socket, Protocol::LOCK);
+        }
         writeLog(std::string("gestureLock: ") + std::to_string(gestureLock));
         return;
       }

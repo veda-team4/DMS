@@ -28,6 +28,8 @@ namespace Protocol {
     CALIBRATE_FINISH,
     MONITOR,
     STOP,
+    LOCK,
+    UNLOCK,
     NOTHING,
     // SERVER -> CLIENT [TYPE]
     OPENEDEAR,
