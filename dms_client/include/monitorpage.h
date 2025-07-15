@@ -40,6 +40,7 @@ private:
   QTimer* wakeupTimer;
   bool wakeupFlashOn = false;
   bool wakeupFlashing = false;
+  void wakeupUI(bool on);
 
   void readFrame();
 };
