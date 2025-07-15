@@ -20,8 +20,8 @@ extern std::atomic<bool> running; // 쓰레드 동작 제어 변수
 
 extern std::vector<int> landmarkIdx; // 사용할 얼굴 랜드마크
 
-extern std::chrono::time_point<std::chrono::steady_clock> lastLeftTime, lastRightTime, lastPauseTime;
-extern std::chrono::time_point<std::chrono::steady_clock> leftTime, rightTime, pauseTime;
+extern std::chrono::time_point<std::chrono::steady_clock> lastLeftTime, lastRightTime, lastStretchTime;
+extern std::chrono::time_point<std::chrono::steady_clock> leftTime, rightTime, stretchTime;
 extern std::mutex timeMutex;
 
 extern int server_fd, client_fd; // 서버, 클라이언트 소켓 파일 디스크립터

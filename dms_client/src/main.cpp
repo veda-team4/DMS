@@ -3,6 +3,7 @@
 #include "mainwindow.h"
 
 unsigned char key[33] = "abcdefghijklmnopqrstuvwxyz012345";
+bool gestureLock = true;
 
 int main(int argc, char* argv[]) {
   setenv("QT_QPA_PLATFORM", "xcb", 1);

@@ -70,11 +70,20 @@ void CamSetPage::readSocket() {
       quint8 cmd = static_cast<quint8>(decrypted[0]);
 
       if (cmd == Protocol::RIGHT) {
-        ui->nextButton->click();
+        if (!gestureLock) {
+          ui->nextButton->click();
+        }
         return;
       }
       else if (cmd == Protocol::LEFT) {
-        ui->previousButton->click();
+        if (!gestureLock) {
+          ui->previousButton->click();
+        }
+        return;
+      }
+      else if (cmd == Protocol::STRETCH) {
+        gestureLock = !gestureLock;
+        writeLog(std::string("gestureLock: ") + std::to_string(gestureLock));
         return;
       }
 

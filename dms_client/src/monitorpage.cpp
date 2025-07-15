@@ -10,14 +10,14 @@ MonitorPage::MonitorPage(QWidget* parent, QLocalSocket* socket) : BasePage(paren
   // WakeUP 레이블 번쩍번쩍 기능
   wakeupTimer = new QTimer(this);
   connect(wakeupTimer, &QTimer::timeout, this, [=]() {
-    if(wakeupFlashOn) {
+    if (wakeupFlashOn) {
       ui->wakeupLabel->setStyleSheet("background-color: white; color: black; font-size: 24px; font-weight: bold; border-radius: 8px; border: 2px solid black;");
     }
     else {
       ui->wakeupLabel->setStyleSheet("background-color: red; color: black; font-size: 24px; font-weight: bold; border-radius: 8px; border: 2px solid black;");
     }
     wakeupFlashOn = !wakeupFlashOn;
-  });
+    });
   ui->wakeupLabel->hide();
   ui->wakeupCloseButton->hide();
   connect(ui->wakeupCloseButton, &QPushButton::clicked, this, [=]() {
@@ -25,7 +25,7 @@ MonitorPage::MonitorPage(QWidget* parent, QLocalSocket* socket) : BasePage(paren
     ui->wakeupLabel->hide();
     ui->wakeupCloseButton->hide();
     wakeupFlashing = false;
-  });
+    });
 }
 
 MonitorPage::~MonitorPage()
@@ -47,6 +47,10 @@ void MonitorPage::deactivate() {
   }
   buffer.clear();
   ciphertext_len = -1;
+  wakeupTimer->stop();
+  ui->wakeupLabel->hide();
+  ui->wakeupCloseButton->hide();
+  wakeupFlashing = false;
 }
 
 void MonitorPage::readFrame() {
@@ -89,18 +93,28 @@ void MonitorPage::readFrame() {
       // 복호화된 평문에서 명령과 길이 추출
       quint8 cmd = static_cast<quint8>(decrypted[0]);
 
-      if(cmd == Protocol::HEADDROPPED) {
-        if(!wakeupFlashing) {
-            wakeupFlashing = true;
-            ui->wakeupLabel->show();
-            wakeupTimer->start(300);
-            ui->wakeupCloseButton->show();
+      if (cmd == Protocol::HEADDROPPED) {
+        if (!wakeupFlashing) {
+          wakeupFlashing = true;
+          ui->wakeupLabel->show();
+          wakeupTimer->start(300);
+          ui->wakeupCloseButton->show();
         }
         return;
       }
 
       if (cmd == Protocol::LEFT) {
-        ui->previousButton->click();
+        if (!gestureLock) {
+          ui->previousButton->click();
+        }
+        return;
+      }
+      else if (cmd == Protocol::RIGHT) {
+        return;
+      }
+      else if (cmd == Protocol::STRETCH) {
+        gestureLock = !gestureLock;
+        writeLog(std::string("gestureLock: ") + std::to_string(gestureLock));
         return;
       }
 
@@ -120,11 +134,11 @@ void MonitorPage::readFrame() {
         double value = *reinterpret_cast<const double*>(decrypted.constData() + 5);
         ui->sleepingBar->setValue((int)(value * 100.0));
 
-        if(!wakeupFlashing && value >= BLINK_RATIO_THRESH) {
-            wakeupFlashing = true;
-            ui->wakeupLabel->show();
-            wakeupTimer->start(300);
-            ui->wakeupCloseButton->show();
+        if (!wakeupFlashing && value >= BLINK_RATIO_THRESH) {
+          wakeupFlashing = true;
+          ui->wakeupLabel->show();
+          wakeupTimer->start(300);
+          ui->wakeupCloseButton->show();
         }
       }
       else {

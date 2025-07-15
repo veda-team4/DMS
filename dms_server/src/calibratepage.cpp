@@ -115,6 +115,17 @@ int calibratepage(double* thresholdEAR) {
       }
     }
 
+    {
+      std::lock_guard<std::mutex> lock(timeMutex);
+      if (std::chrono::duration_cast<std::chrono::milliseconds>(stretchTime - lastStretchTime).count() > 0) {
+        writeLog("Gesture: STRETCH");
+        lastStretchTime = stretchTime;
+        if (writeEncryptedCommand(client_fd, Protocol::STRETCH) == -1) {
+          return -1;
+        }
+      }
+    }
+
     // 클라이언트에 프레임 전송하기
     std::vector<uchar> buf;
     cv::imencode(".jpg", frame, buf);

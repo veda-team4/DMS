@@ -6,6 +6,8 @@
 #include <QBuffer>
 #include "basepage.h"
 
+extern bool gestureLock;
+
 namespace Ui {
   class CamSetPage;
 }

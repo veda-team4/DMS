@@ -22,8 +22,8 @@ std::atomic<bool> running = true; // 쓰레드 동작 제어 변수
 
 std::vector<int> landmarkIdx = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59 }; // 사용할 얼굴 랜드마크
 
-std::chrono::time_point<std::chrono::steady_clock> lastLeftTime, lastRightTime, lastPauseTime;
-std::chrono::time_point<std::chrono::steady_clock> leftTime, rightTime, pauseTime;
+std::chrono::time_point<std::chrono::steady_clock> lastLeftTime, lastRightTime, lastStretchTime;
+std::chrono::time_point<std::chrono::steady_clock> leftTime, rightTime, stretchTime;
 std::mutex timeMutex;
 
 int server_fd, client_fd; // 서버, 클라이언트 소켓 파일 디스크립터

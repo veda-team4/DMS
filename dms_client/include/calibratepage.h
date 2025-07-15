@@ -10,6 +10,8 @@
 #include <QTimer>
 #include "basepage.h"
 
+extern bool gestureLock;
+
 namespace Ui {
   class CalibratePage;
 }

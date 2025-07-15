@@ -7,6 +7,8 @@
 #include <QTimer>
 #include "basepage.h"
 
+extern bool gestureLock;
+
 #define BLINK_RATIO_THRESH 0.6 // 2초 중 얼만큼을 눈을 감아야 경고할지에 대한 비율
 
 namespace Ui {

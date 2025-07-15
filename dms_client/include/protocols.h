@@ -1,6 +1,8 @@
 #ifndef PROTOCOLS_H
 #define PROTOCOLS_H
 
+#include <cstdint>
+
 /*
 통신 간에 사용할 프로토콜 정의
 
@@ -37,7 +39,7 @@ namespace Protocol {
     HEADDROPPED,
     LEFT,
     RIGHT,
-    PAUSE
+    STRETCH
   };
 }
 

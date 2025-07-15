@@ -5,6 +5,8 @@
 #include <QLocalSocket>
 #include "basepage.h"
 
+extern bool gestureLock;
+
 namespace Ui {
   class StartPage;
 }

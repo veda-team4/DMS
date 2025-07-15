@@ -9,8 +9,6 @@
 #include "protocols.h"
 
 int startpage() {
-  lastLeftTime = lastRightTime = lastPauseTime = std::chrono::steady_clock::now();
-
   while (true) {
     // 클라이언트 측으로부터 STOP 프로토콜 수신 시 종료
     uint8_t protocol;
@@ -45,7 +43,29 @@ int startpage() {
         }
       }
     }
-  }
 
+    {
+      std::lock_guard<std::mutex> lock(timeMutex);
+      if (std::chrono::duration_cast<std::chrono::milliseconds>(leftTime - lastLeftTime).count() > 0) {
+        writeLog("Gesture: LEFT");
+        lastLeftTime = leftTime;
+        if (writeEncryptedCommand(client_fd, Protocol::LEFT) == -1) {
+          return -1;
+        }
+      }
+    }
+
+    {
+      std::lock_guard<std::mutex> lock(timeMutex);
+      if (std::chrono::duration_cast<std::chrono::milliseconds>(stretchTime - lastStretchTime).count() > 0) {
+        writeLog("Gesture: STRETCH");
+        lastStretchTime = stretchTime;
+        if (writeEncryptedCommand(client_fd, Protocol::STRETCH) == -1) {
+          return -1;
+        }
+      }
+    }
+
+  }
   return 0;
 }
