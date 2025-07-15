@@ -4,7 +4,7 @@
 #include "utils.h"
 #include "protocols.h"
 
-CamSetPage::CamSetPage(QWidget* parent, QLocalSocket* socket) : BasePage(parent), socket(socket), ui(new Ui::CamSetPage) {
+CamSetPage::CamSetPage(QWidget* parent, MainWindow* mainWindow, QLocalSocket* socket) : BasePage(parent), mainWindow(mainWindow), socket(socket), ui(new Ui::CamSetPage) {
   ui->setupUi(this);
   connect(ui->nextButton, &QPushButton::clicked, this, &CamSetPage::moveToNext);
   connect(ui->previousButton, &QPushButton::clicked, this, &CamSetPage::moveToPrevious);
@@ -70,27 +70,20 @@ void CamSetPage::readSocket() {
       quint8 cmd = static_cast<quint8>(decrypted[0]);
 
       if (cmd == Protocol::RIGHT) {
-        if (!gestureLock) {
+        if (!mainWindow->isLock()) {
           ui->nextButton->click();
         }
         return;
       }
       else if (cmd == Protocol::LEFT) {
-        if (!gestureLock) {
+        if (!mainWindow->isLock()) {
           ui->previousButton->click();
         }
         return;
-      }
+    }
       else if (cmd == Protocol::STRETCH) {
-        if (gestureLock) {
-          gestureLock = false;
-          writeEncryptedCommand(socket, Protocol::UNLOCK);
-        }
-        else {
-          gestureLock = true;
-          writeEncryptedCommand(socket, Protocol::LOCK);
-        }
-        writeLog(std::string("gestureLock: ") + std::to_string(gestureLock));
+        mainWindow->updateLock();
+        writeEncryptedCommand(socket, (mainWindow->isLock() ? Protocol::LOCK : Protocol::UNLOCK));
         return;
       }
 

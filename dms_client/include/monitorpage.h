@@ -6,6 +6,7 @@
 #include <QByteArray>
 #include <QTimer>
 #include "basepage.h"
+#include "mainwindow.h"
 
 extern bool gestureLock;
 
@@ -15,11 +16,13 @@ namespace Ui {
   class MonitorPage;
 }
 
+class MainWindow;
+
 class MonitorPage : public BasePage {
   Q_OBJECT
 
 public:
-  explicit MonitorPage(QWidget* parent, QLocalSocket* socket);
+  explicit MonitorPage(QWidget* parent, MainWindow* mainWindow, QLocalSocket* socket);
   ~MonitorPage();
 
   void activate() override;
@@ -27,6 +30,7 @@ public:
 
 private:
   Ui::MonitorPage* ui;
+  MainWindow* mainWindow;
   QLocalSocket* socket;
   QByteArray buffer;
   QByteArray iv;

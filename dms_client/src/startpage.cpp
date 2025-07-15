@@ -3,7 +3,7 @@
 #include "protocols.h"
 #include "utils.h"
 
-StartPage::StartPage(QWidget* parent, QLocalSocket* socket) : BasePage(parent), socket(socket), ui(new Ui::StartPage) {
+StartPage::StartPage(QWidget* parent, MainWindow* mainWindow, QLocalSocket* socket) : BasePage(parent), mainWindow(mainWindow), socket(socket), ui(new Ui::StartPage) {
   ui->setupUi(this);
   connect(ui->nextButton, &QPushButton::clicked, this, &StartPage::moveToNext);
 }
@@ -68,7 +68,7 @@ void StartPage::readSocket() {
       quint8 cmd = static_cast<quint8>(decrypted[0]);
 
       if (cmd == Protocol::RIGHT) {
-        if (!gestureLock) {
+        if (!mainWindow->isLock()) {
           ui->nextButton->click();
         }
         return;
@@ -77,15 +77,8 @@ void StartPage::readSocket() {
         return;
       }
       else if (cmd == Protocol::STRETCH) {
-        if (gestureLock) {
-          gestureLock = false;
-          writeEncryptedCommand(socket, Protocol::UNLOCK);
-        }
-        else {
-          gestureLock = true;
-          writeEncryptedCommand(socket, Protocol::LOCK);
-        }
-        writeLog(std::string("gestureLock: ") + std::to_string(gestureLock));
+        mainWindow->updateLock();
+        writeEncryptedCommand(socket, (mainWindow->isLock() ? Protocol::LOCK : Protocol::UNLOCK));
         return;
       }
       else {

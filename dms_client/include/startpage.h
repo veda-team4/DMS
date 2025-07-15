@@ -4,17 +4,18 @@
 #include <QWidget>
 #include <QLocalSocket>
 #include "basepage.h"
-
-extern bool gestureLock;
+#include "mainwindow.h"
 
 namespace Ui {
   class StartPage;
 }
 
+class MainWindow;
+
 class StartPage : public BasePage {
   Q_OBJECT
 public:
-  explicit StartPage(QWidget* parent, QLocalSocket* socket);
+  explicit StartPage(QWidget* parent, MainWindow* mainWindow, QLocalSocket* socket);
   ~StartPage();
 
 public:
@@ -23,6 +24,7 @@ public:
 
 private:
   Ui::StartPage* ui;
+  MainWindow* mainWindow;
   QLocalSocket* socket;
   QByteArray buffer;
   QByteArray iv;

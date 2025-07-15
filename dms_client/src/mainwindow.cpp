@@ -63,10 +63,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
   }
 
   // 페이지 생성
-  startPage = new StartPage(nullptr, socket);
-  camSetPage = new CamSetPage(nullptr, socket);
-  calibratePage = new CalibratePage(nullptr, socket);
-  monitorPage = new MonitorPage(nullptr, socket);
+  startPage = new StartPage(nullptr, this, socket);
+  camSetPage = new CamSetPage(nullptr, this, socket);
+  calibratePage = new CalibratePage(nullptr, this, socket);
+  monitorPage = new MonitorPage(nullptr, this, socket);
 
   // 페이지 스택에 추가
   ui->stackedWidget->addWidget(startPage);
@@ -129,6 +129,15 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event) {
   }
 
   return QMainWindow::eventFilter(obj, event);
+}
+
+void MainWindow::updateLock() {
+  gestureLock = !gestureLock;
+  ui->lockLabel->setVisible(gestureLock);
+}
+
+bool MainWindow::isLock() {
+  return gestureLock;
 }
 
 void MainWindow::showStartPage() {

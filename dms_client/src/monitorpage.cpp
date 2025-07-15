@@ -3,7 +3,7 @@
 #include "utils.h"
 #include "protocols.h"
 
-MonitorPage::MonitorPage(QWidget* parent, QLocalSocket* socket) : BasePage(parent), ui(new Ui::MonitorPage), socket(socket) {
+MonitorPage::MonitorPage(QWidget* parent, MainWindow* mainWindow, QLocalSocket* socket) : BasePage(parent), mainWindow(mainWindow), ui(new Ui::MonitorPage), socket(socket) {
   ui->setupUi(this);
   connect(ui->previousButton, &QPushButton::clicked, this, &MonitorPage::moveToPrevious);
 
@@ -104,7 +104,7 @@ void MonitorPage::readFrame() {
       }
 
       if (cmd == Protocol::LEFT) {
-        if (!gestureLock) {
+        if (!mainWindow->isLock()) {
           ui->previousButton->click();
         }
         return;
@@ -113,15 +113,8 @@ void MonitorPage::readFrame() {
         return;
       }
       else if (cmd == Protocol::STRETCH) {
-        if (gestureLock) {
-          gestureLock = false;
-          writeEncryptedCommand(socket, Protocol::UNLOCK);
-        }
-        else {
-          gestureLock = true;
-          writeEncryptedCommand(socket, Protocol::LOCK);
-        }
-        writeLog(std::string("gestureLock: ") + std::to_string(gestureLock));
+        mainWindow->updateLock();
+        writeEncryptedCommand(socket, (mainWindow->isLock() ? Protocol::LOCK : Protocol::UNLOCK));
         return;
       }
 
