@@ -9,16 +9,19 @@
 #include <QThread>
 #include <QTimer>
 #include "basepage.h"
+#include "mainwindow.h"
 
 namespace Ui {
   class CalibratePage;
 }
 
+class MainWindow;
+
 class CalibratePage : public BasePage {
   Q_OBJECT
 
 public:
-  explicit CalibratePage(QWidget* parent, QLocalSocket* socket);
+  explicit CalibratePage(QWidget* parent, MainWindow* mainWindow, QLocalSocket* socket);
   ~CalibratePage();
 
   void activate() override;
@@ -30,6 +33,7 @@ private slots:
 
 private:
   Ui::CalibratePage* ui;
+  MainWindow* mainWindow;
   QLocalSocket* socket;
   QByteArray buffer;
   QByteArray iv;

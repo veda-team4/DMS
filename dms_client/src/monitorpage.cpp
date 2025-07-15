@@ -3,35 +3,52 @@
 #include "utils.h"
 #include "protocols.h"
 
-MonitorPage::MonitorPage(QWidget* parent, QLocalSocket* socket) : BasePage(parent), ui(new Ui::MonitorPage), socket(socket) {
+MonitorPage::MonitorPage(QWidget* parent, MainWindow* mainWindow, QLocalSocket* socket) : BasePage(parent), mainWindow(mainWindow), ui(new Ui::MonitorPage), socket(socket) {
   ui->setupUi(this);
   connect(ui->previousButton, &QPushButton::clicked, this, &MonitorPage::moveToPrevious);
 
   // WakeUP 레이블 번쩍번쩍 기능
   wakeupTimer = new QTimer(this);
   connect(wakeupTimer, &QTimer::timeout, this, [=]() {
-    if(wakeupFlashOn) {
+    if (wakeupFlashOn) {
       ui->wakeupLabel->setStyleSheet("background-color: white; color: black; font-size: 24px; font-weight: bold; border-radius: 8px; border: 2px solid black;");
     }
     else {
       ui->wakeupLabel->setStyleSheet("background-color: red; color: black; font-size: 24px; font-weight: bold; border-radius: 8px; border: 2px solid black;");
     }
     wakeupFlashOn = !wakeupFlashOn;
-  });
+    });
+
   ui->wakeupLabel->hide();
   ui->wakeupCloseButton->hide();
+
   connect(ui->wakeupCloseButton, &QPushButton::clicked, this, [=]() {
     wakeupTimer->stop();
     ui->wakeupLabel->hide();
     ui->wakeupCloseButton->hide();
     wakeupFlashing = false;
-  });
+    });
 }
 
 MonitorPage::~MonitorPage()
 {
   delete wakeupTimer;
   delete ui;
+}
+
+void MonitorPage::wakeupUI(bool on) {
+  if (on && !wakeupFlashing) {
+    wakeupFlashing = true;
+    ui->wakeupLabel->show();
+    ui->wakeupCloseButton->show();
+    wakeupTimer->start(300);
+  }
+  else if (!on && wakeupFlashing) {
+    wakeupFlashing = false;
+    wakeupTimer->stop();
+    ui->wakeupLabel->hide();
+    ui->wakeupCloseButton->hide();
+  }
 }
 
 void MonitorPage::activate() {
@@ -47,6 +64,7 @@ void MonitorPage::deactivate() {
   }
   buffer.clear();
   ciphertext_len = -1;
+  wakeupUI(false);
 }
 
 void MonitorPage::readFrame() {
@@ -89,14 +107,30 @@ void MonitorPage::readFrame() {
       // 복호화된 평문에서 명령과 길이 추출
       quint8 cmd = static_cast<quint8>(decrypted[0]);
 
-      if(cmd == Protocol::HEADDROPPED) {
-        if(!wakeupFlashing) {
-            wakeupFlashing = true;
-            ui->wakeupLabel->show();
-            wakeupTimer->start(300);
-            ui->wakeupCloseButton->show();
+      if (cmd == Protocol::HEADDROPPED) {
+        wakeupUI(true);
+        return;
+      }
+
+      if (cmd == Protocol::LEFT) {
+        if (!mainWindow->isLock()) {
+          ui->previousButton->click();
         }
         return;
+      }
+      else if (cmd == Protocol::RIGHT) {
+        return;
+      }
+      else if (cmd == Protocol::STRETCH) {
+        if (wakeupFlashing) {
+          wakeupUI(false);
+          return;
+        }
+        else {
+          mainWindow->updateLock();
+          writeEncryptedCommand(socket, (mainWindow->isLock() ? Protocol::LOCK : Protocol::UNLOCK));
+          return;
+        }
       }
 
       quint32 dataLen = *reinterpret_cast<const quint32*>(decrypted.constData() + 1);
@@ -115,11 +149,8 @@ void MonitorPage::readFrame() {
         double value = *reinterpret_cast<const double*>(decrypted.constData() + 5);
         ui->sleepingBar->setValue((int)(value * 100.0));
 
-        if(!wakeupFlashing && value >= BLINK_RATIO_THRESH) {
-            wakeupFlashing = true;
-            ui->wakeupLabel->show();
-            wakeupTimer->start(300);
-            ui->wakeupCloseButton->show();
+        if (value >= BLINK_RATIO_THRESH) {
+          wakeupUI(true);
         }
       }
       else {

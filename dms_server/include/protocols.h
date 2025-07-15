@@ -1,6 +1,8 @@
 #ifndef PROTOCOLS_H
 #define PROTOCOLS_H
 
+#include <cstdint>
+
 /*
 통신 간에 사용할 프로토콜 정의
 
@@ -18,6 +20,7 @@ protocols.h 에는 첫 1바이트에 해당하는 Type / Command 를 정의한�
 namespace Protocol {
   enum Type : uint8_t {
     // SERVER <- CLIENT [COMMAND]
+    STARTPAGE,
     CAMSET,
     CALIBRATE,
     CALIBRATE_OPENED,
@@ -25,6 +28,8 @@ namespace Protocol {
     CALIBRATE_FINISH,
     MONITOR,
     STOP,
+    LOCK,
+    UNLOCK,
     NOTHING,
     // SERVER -> CLIENT [TYPE]
     OPENEDEAR,
@@ -33,7 +38,10 @@ namespace Protocol {
     EYECLOSEDRATIO,
     FRAME,
     // SERVER -> CLIENT [COMMAND]
-    HEADDROPPED
+    HEADDROPPED,
+    LEFT,
+    RIGHT,
+    STRETCH
   };
 }
 
