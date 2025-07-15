@@ -24,6 +24,9 @@ set(PROJECT_SOURCES
         src/calibratepage.cpp include/calibratepage.h ui/calibratepage.ui
         src/monitorpage.cpp include/monitorpage.h ui/monitorpage.ui
         src/utils.cpp include/utils.h
+        src/led.cpp include/led.h
+        src/speaker.cpp include/speaker.h
+        src/bluetooth.cpp include/bluetooth.h
         include/protocols.h
         resources/resources.qrc
 )

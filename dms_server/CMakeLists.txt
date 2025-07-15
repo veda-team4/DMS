@@ -34,6 +34,8 @@ add_executable(dms_server
  src/calibratepage.cpp
  src/monitorpage.cpp
  src/startpage.cpp
+ src/co2.cpp
+ src/gps.cpp
  )
 
 target_link_libraries(dms_server ${OpenCV_LIBS} dlib OpenSSL::SSL OpenSSL::Crypto)
