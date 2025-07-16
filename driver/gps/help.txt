@@ -1,0 +1,30 @@
+# Set to GPS
+$ sudo raspi-config
+=> Interface Options 
+=> Serial Port Enable/Disable ...
+1. Login shell access -> No
+2. Serial Port Hardware to be enabled -> yes
+
+$ sudo reboot
+
+# Check GPS device
+$ dmesg | grep tty
+-> 일반적으로 /dev/ttyS0, /dev/ttyUSB0, /dev/ttyACM0 등으로 표시됨
+
+# Test GPS data stream
+$ cat /dev/ttyS0
+-> "$GNRMC", "$GNGGA" 등의 NMEA 문장이 주기적으로 출력되는지 확인
+
+# GPS pinmap (UART 연결 기준)
+GPS 모듈       RPi (BCM 핀번호 기준)
+
+TX             BCM15 (RX)
+RX             BCM14 (TX)
+GND            Physical6
+VCC            Physical1 (3.3V)
+
+※ TX/RX는 교차 연결 (GPS TX → RPi RX)
+
+# [NEO-M8N]
+device : /dev/ttyS0
+Baud   : 9600
