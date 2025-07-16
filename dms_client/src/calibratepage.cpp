@@ -4,7 +4,7 @@
 #include "utils.h"
 #include "protocols.h"
 
-CalibratePage::CalibratePage(QWidget* parent, QLocalSocket* socket) : BasePage(parent), socket(socket), ui(new Ui::CalibratePage) {
+CalibratePage::CalibratePage(QWidget* parent, MainWindow* mainWindow, QLocalSocket* socket) : BasePage(parent), mainWindow(mainWindow), socket(socket), ui(new Ui::CalibratePage) {
   ui->setupUi(this);
   ui->progressBar->setValue(0);
   connect(ui->nextButton, &QPushButton::clicked, this, &CalibratePage::moveToNextStep);
@@ -32,13 +32,9 @@ CalibratePage::~CalibratePage() {
 void CalibratePage::activate() {
   writeEncryptedCommand(socket, Protocol::CALIBRATE);
   connect(socket, &QLocalSocket::readyRead, this, &CalibratePage::readFrame);
-  clickCount = 0;
   progressStep = 0;
-  ui->infoLabel->setText("뜬 눈의 크기를 측정합니다. 준비 완료 시 버튼을 눌러주세요.");
+  // ui->infoLabel->setText("뜬 눈의 크기를 측정합니다. 준비 완료 시 버튼을 눌러주세요.");
   ui->progressBar->setValue(0);
-  ui->openedVal->setText("0.0");
-  ui->closedVal->setText("0.0");
-  ui->thresholdVal->setText("0.0");
 }
 
 void CalibratePage::deactivate() {
@@ -88,7 +84,7 @@ void CalibratePage::moveToNextStep() {
     break;
   case 4:
     emit moveToNext();
-    break;
+    return;
   }
   ++clickCount;
 }
@@ -155,6 +151,25 @@ void CalibratePage::readFrame() {
 
       // 복호화된 평문에서 명령과 길이 추출
       quint8 cmd = static_cast<quint8>(decrypted[0]);
+
+      if (cmd == Protocol::RIGHT) {
+        if (!mainWindow->isLock()) {
+          ui->nextButton->click();
+        }
+        return;
+      }
+      else if (cmd == Protocol::LEFT) {
+        if (!mainWindow->isLock()) {
+          ui->previousButton->click();
+        }
+        return;
+      }
+      else if (cmd == Protocol::STRETCH) {
+        mainWindow->updateLock();
+        writeEncryptedCommand(socket, (mainWindow->isLock() ? Protocol::LOCK : Protocol::UNLOCK));
+        return;
+      }
+
       quint32 dataLen = *reinterpret_cast<const quint32*>(decrypted.constData() + 1);
 
       if (cmd == Protocol::FRAME) {

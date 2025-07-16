@@ -22,6 +22,8 @@ class MainWindow : public QMainWindow {
 public:
   MainWindow(QWidget* parent = nullptr);
   ~MainWindow();
+  void updateLock();
+  bool isLock();
 
 protected:
   bool eventFilter(QObject* obj, QEvent* event) override;
@@ -46,5 +48,6 @@ private:
   QProcess* serverProcess;
   QLocalSocket* socket;
 
+  bool gestureLock = true;
 };
 #endif // MAINWINDOW_H

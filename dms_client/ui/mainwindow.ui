@@ -165,11 +165,29 @@ QPushButton:pressed {
      <string>X</string>
     </property>
    </widget>
-   <zorder>stackedWidget</zorder>
-   <zorder>dragLabel</zorder>
-   <zorder>closeButton</zorder>
+   <widget class="QLabel" name="lockLabel">
+    <property name="geometry">
+     <rect>
+      <x>8</x>
+      <y>8</y>
+      <width>51</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="../resources/resources.qrc">:/images/image/lock.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
