@@ -1,39 +1,37 @@
-# LED kernel module up
-1. $ `make`
+# LED kernel install
+1. $ make
+-> kernel build
 
-2. $ dtoverlay dms_led.dtbo
-   $ dtoverlay -l 
-   -> dms_led device tree에 overlay되었는지 확인
+2. $ make clean
+-> dms_led.ko & dms_led.dtbo 빼고 제거
 
-3. $ insmod dms_led.ko
-   $ dmesg 
-   -> 커널 로그 확인(모듈 올라갔는지)
-    
-    [18927.501205] dms_led_driver dms_led: [dms_led] Module is up...
-    [18927.501226] [dms_led] major number = 236
-    
-4. main문에서 실행 후
-   $ dmesg: 커널 로그 확인 → device 파일 열었는지 확인
+3. $ make install
+-> 자동으로 LED 커널에 필요한 것 설치
 
-[18937.533239] [dms_led] device opened...
-[18944.945372] [dms_led] device closed...
+4. $ sudo reboot
 
-# How to use Makefile
-1. driver code build
-$ make led-dev
+# reboot 후 LED kernel 자동으로 올라갔는지 확인 
+$ cat /boot/firmware/config.txt | grep dtoverlay
 
-2. user code build
-$ make led-app
+dtoverlay=vc4-kms-v3d
+dtoverlay=dwc2,dr_mode=host
+dtoverlay=hifiberry-dac
+dtoverlay=dms_led
 
-3. device tree build
-$ make led-dts
--> .dtbo file 생성
+$ lsmod | grep dms_led
+dms_led                12288  0
 
-4. all build
-$ make
+$ dmesg | grep dms_led
+[    2.599682] dms_led: loading out-of-tree module taints kernel.
+[    2.600186] dms_led_driver dms_led: [dms_led] Module is up...
+[    2.600199] [dms_led] major number = 239
 
-5. build 명령어 확인
-$ build help
+$ ls -l /dev/dms_led
+crw-rw-rw- 1 root root 239, 0 Jul 16 15:11 /dev/dms_led
 
-6. clean
-$ make clean
+$ ls -l /sys/class/dms_led_class/dms_led
+lrwxrwxrwx 1 root root 0 Jul 16 15:11 /sys/class/dms_led_class/dms_led -> ../../devices/virtual/dms_led_class/dms_led
+
+$ cat /sys/class/dms_led_class/dms_led/dev
+239:0
+
