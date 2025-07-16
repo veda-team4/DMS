@@ -10,3 +10,19 @@ sudo reboot
 # 상단바 제거 
 ~/.config/wf-panel-pi.ini
 autohide=true
+
+# Set to Speaker
+$ sudo vim /boot/firmware/config.txt
+-> 해당 파일에 아래 명령어 추가
+dtoverlay=hifiberry-dac
+$ sudo reboot
+
+# Speaker pinmap
+speaker		RSP
+
+LRC		BCM19
+BCLK		BCM18
+DIN		BCM21
+
+GND		Physical6
+VIN		Physical2
