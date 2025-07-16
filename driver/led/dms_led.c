@@ -5,6 +5,7 @@
 #include <linux/of_device.h>
 #include <linux/platform_device.h>
 
+
 #include <linux/major.h>
 #include <linux/fs.h>
 #include <linux/cdev.h>
@@ -36,7 +37,7 @@ static int dms_led_open(struct inode *inode, struct file *filp);
 static int dms_led_release(struct inode *inode, struct file *filp);
 static ssize_t dms_led_write(struct file *filp, const char __user *buf, size_t count, loff_t *f_pos);
 static ssize_t dms_led_read(struct file *filp, char __user *buf, size_t count, loff_t *f_pos);
-static ssize_t dms_led_ioctl(struct file *filp, unsigned int cmd, unsigned long arg);
+static long dms_led_ioctl(struct file *filp, unsigned int cmd, unsigned long arg);
 
 static int dms_led_open(struct inode *inode, struct file *filp)
 {
@@ -92,19 +93,15 @@ static ssize_t dms_led_read(struct file *filp, char __user *buf, size_t count, l
     return count;
 }
 
-// ioctl 호출 시 LED ON/OFF 처리
-static ssize_t dms_led_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
-{
-    if(_IOC_TYPE(cmd) != DMS_MAGIC) return -EINVAL;
-    if(_IOC_NR(cmd) >= DMS_MAXNR) return -EINVAL;
-
-    switch(cmd){
+static long dms_led_ioctl(struct file *filp, unsigned int cmd, unsigned long arg) {
+    if(_IOC_TYPE(cmd) != DMS_MAGIC || _IOC_NR(cmd) >= DMS_MAXNR) return -EINVAL;
+    switch(cmd) {
         case DMS_LED_OFF:
             gpiod_set_value(dev->led_gpiod, 0); // active low
             break;
         
         case DMS_LED_ON:
-            gpiod_set_value(dev->led_gpiod, 1); //
+            gpiod_set_value(dev->led_gpiod, 1); 
 
             break;
     }
@@ -113,8 +110,8 @@ static ssize_t dms_led_ioctl(struct file *filp, unsigned int cmd, unsigned long 
 
 }
 
-// 파일 디스크립터 구조체 등록
-struct file_operations dms_led_fops = {
+static struct file_operations dms_led_fops = {
+    .owner              = THIS_MODULE,
     .open               = dms_led_open,
     .release             = dms_led_release,
     .write              = dms_led_write,
@@ -157,13 +154,12 @@ static int dms_led_register_cdev(void)
 }
 
 // 플랫폼 드라이버 probe 함수
-// device tree 기반으로 GPIO 요청하고, cdev 드라이버 플랫폼 드라이버 함수
+// device tree 기반으로 GPIO 요청하고, cdev emdfhrgksms 플랫폼 드라이버 함수
 static int dms_led_probe(struct platform_device *pdev)
 {   
     // kalloc (0으로 초기화해서 메모리 할당)
     dev = devm_kzalloc(&pdev->dev, sizeof(*dev), GFP_KERNEL);
-    if(!dev)    
-        return -ENOMEM;
+    if (!dev) return -ENOMEM;
 
     // Device Tree에서 GPIO 컨트롤러부터 GPIO 핸들러 요청
     dev->led_gpiod = devm_gpiod_get(&pdev->dev, LED_NAME, GPIOD_OUT_LOW);
@@ -184,12 +180,8 @@ static int dms_led_probe(struct platform_device *pdev)
         return result;
     }
 
-    // 클래스 생성 (udev에 알림)
-    dms_led_class = class_create(THIS_MODULE, "dms_led_class");
-    if(IS_ERR(dms_led_class)){
-        dev_err(&pdev->dev, "Failed to create class\n");
-        return PTR_ERR(dms_led_class);
-    }
+    dms_led_class = class_create("dms_led_class");
+    if (IS_ERR(dms_led_class)) return PTR_ERR(dms_led_class);
 
     // 디바이스 생성 -> /dev/dms_led 디바이스 파일 생성
     dms_led_device = device_create(dms_led_class, NULL, dms_led_dev, NULL, "dms_led");
@@ -203,9 +195,7 @@ static int dms_led_probe(struct platform_device *pdev)
 
 }
 
-// platform 함수 remove 함수
-static int dms_led_remove(struct platform_device *pdev)
-{
+static void dms_led_remove(struct platform_device *pdev) {
     struct dms_led_dev *dev = platform_get_drvdata(pdev);
 
     // LED 끄기
@@ -214,13 +204,12 @@ static int dms_led_remove(struct platform_device *pdev)
 
     // 캐릭터 디바이스 해제
     cdev_del(&dms_led_cdev);
-    unregister_chrdev_region(dms_led_dev, 0);
+    unregister_chrdev_region(dms_led_dev, 1);
 
     // 디바이스 제거
     device_destroy(dms_led_class, dms_led_dev);
     class_destroy(dms_led_class);
 
-    return 0;
 }
 
 
