@@ -1,4 +1,12 @@
 #include "gps.h"
+#include <vector>
+#include <fcntl.h>
+#include <unistd.h>
+#include <termios.h>
+#include <sys/select.h>
+#include <sstream>
+#include <iostream>
+#include <cmath>
 
 GPS::GPS(const std::string& device, int baudrate)
     : device(device), baudrate(baudrate), fd(-1) 
@@ -134,6 +142,15 @@ bool GPS::parseNMEA(const std::string& sentence) {
     latitude = convertToDecimal(fields[latIdx], fields[latDirIdx][0]);
     longitude = convertToDecimal(fields[lonIdx], fields[lonDirIdx][0]);
 
+    return true;
+}
+
+bool GPS::cur_location(double* _latitute, double* _longitude) {
+    if (!update()) {
+        return false;
+    }
+    *_latitute = latitude;
+    *_longitude = longitude;
     return true;
 }
 
