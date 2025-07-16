@@ -187,6 +187,10 @@ int monitorpage(double thresholdEAR) {
       }
     }
 
+    if (!gestureLock) {
+      drawGestureZones(frame);
+    }
+
     // 클라이언트에 프레임 전송하기
     std::vector<uchar> buf;
     cv::imencode(".jpg", frame, buf);

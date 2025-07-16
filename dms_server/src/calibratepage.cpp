@@ -15,12 +15,10 @@
 #define EAR_THRESH_VAL 0.30 // 감은 눈 EAR + (뜬 눈 EAR - 감은 눈 EAR) * X
 // *******************************************
 
-int calibrateEyes(double& ear, bool opened);
+int calibrateEyes(double* ear, bool opened);
 
-int calibratepage(double* thresholdEAR) {
+int calibratepage(double* thresholdEAR, double* openedEAR, double* closedEAR) {
   // 뜬 눈 EAR, 감은 눈 EAR
-  double openedEAR, closedEAR;
-
   while (true) {
     uint8_t protocol;
     protocol = readEncryptedCommandNonBlock(client_fd);
@@ -33,14 +31,14 @@ int calibratepage(double* thresholdEAR) {
         writeLog("message from client: CALIBRATE_CLOSED");
         calibrateEyes(closedEAR, false);
         // EAR threshold 값 계산
-        *thresholdEAR = closedEAR + (openedEAR - closedEAR) * EAR_THRESH_VAL;
+        *thresholdEAR = *closedEAR + (*openedEAR - *closedEAR) * EAR_THRESH_VAL;
 
         // 클라이언트에 EAR threshold 값 전송하기
         uint8_t protocol = Protocol::EARTHRESHOLD;
         if (writeEncryptedData(client_fd, protocol, *thresholdEAR) == -1) return -1;
 
-        writeLog(std::string("Opened: " + std::to_string(openedEAR)));
-        writeLog(std::string("Closed: " + std::to_string(closedEAR)));
+        writeLog(std::string("Opened: " + std::to_string(*openedEAR)));
+        writeLog(std::string("Closed: " + std::to_string(*closedEAR)));
         writeLog(std::string("Threshold: ") + std::to_string(*thresholdEAR));
       }
       else if (protocol == Protocol::STOP) {
@@ -135,6 +133,10 @@ int calibratepage(double* thresholdEAR) {
       }
     }
 
+    if (!gestureLock) {
+      drawGestureZones(frame);
+    }
+
     // 클라이언트에 프레임 전송하기
     std::vector<uchar> buf;
     cv::imencode(".jpg", frame, buf);
@@ -146,7 +148,7 @@ int calibratepage(double* thresholdEAR) {
   return 0;
 }
 
-int calibrateEyes(double& ear, bool opened) {
+int calibrateEyes(double* ear, bool opened) {
   double earSum = 0.0;
   int earCount = 0;
 
@@ -210,6 +212,10 @@ int calibrateEyes(double& ear, bool opened) {
       ++earCount;
     }
 
+    if (!gestureLock) {
+      drawGestureZones(frame);
+    }
+
     // 클라이언트에 프레임 전송하기
     std::vector<uchar> buf;
     cv::imencode(".jpg", frame, buf);
@@ -218,12 +224,12 @@ int calibrateEyes(double& ear, bool opened) {
     }
   }
 
-  ear = earSum / earCount;
+  *ear = earSum / earCount;
 
   // 클라이언트에 EAR 값 전송하기
   uint8_t protocol = (opened ? Protocol::OPENEDEAR : Protocol::CLOSEDEAR);
-  uint32_t size = sizeof(ear);
-  if (writeEncryptedData(client_fd, protocol, ear) == -1) return -1;
+  uint32_t size = sizeof(*ear);
+  if (writeEncryptedData(client_fd, protocol, *ear) == -1) return -1;
 
   return 0;
 }
