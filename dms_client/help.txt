@@ -17,6 +17,14 @@ $ sudo vim /boot/firmware/config.txt
 dtoverlay=hifiberry-dac
 $ sudo reboot
 
+$ aplay -l
+
+card 3: sndrpihifiberry [snd_rpi_hifiberry_dac], device 0: HifiBerry DAC HiFi pcm5102a-hifi-0 [HifiBerry DAC HiFi pcm5102a-hifi-0]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+
+-> card3, subdevice #0 확인= "plughw:3,0"
+
 # Speaker pinmap
 speaker		RSP
 
