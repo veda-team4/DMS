@@ -35,3 +35,11 @@ lrwxrwxrwx 1 root root 0 Jul 16 15:11 /sys/class/dms_led_class/dms_led -> ../../
 $ cat /sys/class/dms_led_class/dms_led/dev
 239:0
 
+# LED Pinmap
+LED         RSP
+
+DATA        BCM17
+
+GND         Physical9
+VIN         Physical4
+
