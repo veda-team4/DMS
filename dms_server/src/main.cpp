@@ -82,7 +82,7 @@ int main(void) {
   std::thread gestureThread(runGestureDetectionThread);
 
   // 8. 루프 돌며 클라이언트로부터 명령 받아서 실행
-  double thresholdEAR;
+  double thresholdEAR, openedEAR, closedEAR;
   while (true) {
     uint8_t protocol;
     protocol = readEncryptedCommand(client_fd);
@@ -102,7 +102,7 @@ int main(void) {
     }
     else if (protocol == Protocol::CALIBRATE) {
       writeLog("message from client: CALIBRATE");
-      if (calibratepage(&thresholdEAR) == -1) {
+      if (calibratepage(&thresholdEAR, &openedEAR, &closedEAR) == -1) {
         writeLog("calibrate error");
         break;
       }

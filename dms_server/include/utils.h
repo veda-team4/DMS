@@ -12,6 +12,8 @@
 double computeEAR(const dlib::full_object_detection& s, int idx);
 // 로그 출력 함수
 void writeLog(std::string log);
+// 제스처 점선 표시 함수
+void drawGestureZones(cv::Mat& frame);
 // ****************************************************************
 
 // ********************* 소켓 입출력 함수 *************************

@@ -233,3 +233,24 @@ bool aes_decrypt(const unsigned char* ciphertext, int ciphertext_len,
   EVP_CIPHER_CTX_free(ctx);
   return true;
 }
+
+void drawGestureZones(cv::Mat& frame) {
+  int lineSpacing = 10;   // 점선 간격
+  int lineLength = 5;     // 점선 길이
+  int thickness = 2;
+  cv::Scalar color(0, 255, 0);
+
+  int height = frame.rows;
+  int width = frame.cols;
+
+  int leftX = static_cast<int>(width * 0.2);
+  int rightX = static_cast<int>(width * 0.8);
+
+  for (int y = 0; y < height; y += lineSpacing) {
+    // 왼쪽 점선
+    cv::line(frame, cv::Point(leftX, y), cv::Point(leftX, std::min(y + lineLength, height - 1)), color, thickness);
+
+    // 오른쪽 점선
+    cv::line(frame, cv::Point(rightX, y), cv::Point(rightX, std::min(y + lineLength, height - 1)), color, thickness);
+  }
+}

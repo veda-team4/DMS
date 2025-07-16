@@ -53,43 +53,47 @@ void runFaceDetectionThread() {
 constexpr uint8_t DIFF_THRESHOLD = 40;
 constexpr int MORPH_ITERATIONS = 4;
 
-constexpr double STRETCH_RATIO_THRESHOLD = 0.2;
+constexpr double STRETCH_RATIO_THRESHOLD = 0.25;
+constexpr double STRETCH_INCREASE_THRESHOLD = 0.05;
 constexpr int STRETCH_TRIGGER_SCORE = 3;
-constexpr double ACCUM_WEIGHT = 0.1;
 
 constexpr double MOTION_THRESHOLD = 0.02;
 constexpr int MOTION_TRIGGER_SCORE = 3;
 // *******************************************
 
 void runGestureDetectionThread() {
-  lastLeftTime = lastRightTime = lastStretchTime = std::chrono::steady_clock::now();
+  // 시간 값 초기화
+  std::chrono::time_point<std::chrono::steady_clock> latestTime;
+  lastLeftTime = lastRightTime = lastStretchTime = latestTime = std::chrono::steady_clock::now();
+
+  // 연산에 사용되는 cv::Mat 변수
   cv::Mat localFrame, prevFrame, gray, diffGesture, threshGesture;
-  cv::Mat avg32FGray, avg8UGray, diffStretch, threshStretch;
+  cv::Mat resized, ycrcb, mask, blurred, morph;
+
+  // YCrCb 살색 범위 (동양인 기준 넉넉하게)
+  cv::Scalar lower(0, 133, 77);
+  cv::Scalar upper(255, 173, 127);
+  
+  // 손 뻗기 감지용 변수
+  double prevHandRatio = 0.0;
+  int stretchScore = 0;
 
   // 손 좌우 움직이기 감지용 변수
   double prevMotionCenter = 0.0;
   int motionScore = 0;
-
-  // 손 뻗기 감지용 변수
-  int stretchScore = 0;
-
-  // 시간 값 초기화
-  std::chrono::time_point<std::chrono::steady_clock> latestTime;
-  latestTime = std::chrono::steady_clock::now();
 
   // 최초 프레임 값 할당
   while (running) {
     {
       std::lock_guard<std::mutex> lock(frameMutex);
       if (sharedFrame.empty()) continue;
-      sharedFrame.copyTo(prevFrame);
+      sharedFrame.copyTo(localFrame);
     }
-    cv::cvtColor(prevFrame, prevFrame, cv::COLOR_BGR2GRAY);
-    cv::GaussianBlur(prevFrame, prevFrame, cv::Size(5, 5), 0);
-
-    prevFrame.convertTo(avg32FGray, CV_32F);
     break;
   }
+  cv::resize(localFrame, resized, cv::Size(320, 240));
+  cv::cvtColor(resized, gray, cv::COLOR_BGR2GRAY);
+  cv::GaussianBlur(gray, prevFrame, cv::Size(5, 5), 0);
 
   while (running) {
     {
@@ -100,31 +104,31 @@ void runGestureDetectionThread() {
       sharedFrame.copyTo(localFrame); // sharedFrame localFrame에 복사
     }
 
-    // 복사해온 프레임 gray scale로 변환
-    cv::cvtColor(localFrame, gray, cv::COLOR_BGR2GRAY);
-    // 가우시안 필터 적용하여 노이즈 감소
-    cv::GaussianBlur(gray, gray, cv::Size(5, 5), 0);
+    // 해상도 축소
+    cv::resize(localFrame, resized, cv::Size(320, 240));
+    // 블러 (노이즈 제거)
+    cv::GaussianBlur(resized, blurred, cv::Size(5, 5), 0);
+    // 색상 공간 변환
+    cv::cvtColor(blurred, ycrcb, cv::COLOR_BGR2YCrCb);
+    // 살색 영역 마스크
+    cv::inRange(ycrcb, lower, upper, mask);
+    // 모폴로지 연산 (열기/닫기) - 잡음 제거
+    cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
+    cv::morphologyEx(mask, morph, cv::MORPH_OPEN, kernel);
+    cv::morphologyEx(morph, morph, cv::MORPH_CLOSE, kernel);
 
-    // diff 계산을 위해 평균 프레임 자료형 맞춰주기
-    avg32FGray.convertTo(avg8UGray, CV_8U);
-    // 현재 프레임과 평균 프레임의 차이의 절댓값 갖는 프레임 계산
-    cv::absdiff(gray, avg8UGray, diffStretch);
-    // 평균 프레임 갱신
-    cv::accumulateWeighted(gray, avg32FGray, ACCUM_WEIGHT);
-    // 프레임 이진화
-    cv::threshold(diffStretch, threshStretch, DIFF_THRESHOLD, 255, cv::THRESH_BINARY);
-    // 모폴로지 연산. 침식 -> 팽창. 작은 노이즈 제거
-    cv::erode(diffStretch, diffStretch, cv::Mat(), cv::Point(-1, -1), MORPH_ITERATIONS);
-    cv::dilate(diffStretch, diffStretch, cv::Mat(), cv::Point(-1, -1), MORPH_ITERATIONS);
-    // 흰색 비율 계산
-    double whiteRatio = (double)cv::countNonZero(threshStretch) / (threshStretch.rows * threshStretch.cols);
+    // 손 영역 비율 계산
+    double handRatio = (double)cv::countNonZero(morph) / (morph.rows * morph.cols);
+
     // 흰색 비율 임계값 넘을시 score 증가
-    if (whiteRatio >= STRETCH_RATIO_THRESHOLD) {
+    if (handRatio >= STRETCH_RATIO_THRESHOLD && handRatio - prevHandRatio >= STRETCH_INCREASE_THRESHOLD) {
       ++stretchScore;
     }
     else {
-      stretchScore = std::max(stretchScore - 1, 0);
+      stretchScore = 0;
     }
+    prevHandRatio = handRatio;
+
     // score 임계값 넘을 시 stretch 감지
     if (stretchScore >= STRETCH_TRIGGER_SCORE) {
       if (std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -139,6 +143,7 @@ void runGestureDetectionThread() {
           continue;
       }
       stretchScore = 0;
+      motionScore = 0;
     }
 
     if (gestureLock) {
@@ -146,15 +151,19 @@ void runGestureDetectionThread() {
       continue;
     }
 
+    // 복사해온 프레임 gray scale로 변환
+    cv::cvtColor(resized, gray, cv::COLOR_BGR2GRAY);
+    // 가우시안 필터 적용하여 노이즈 감소
+    cv::GaussianBlur(gray, blurred, cv::Size(5, 5), 0);
     // 현재 프레임과 이전 프레임의 차이의 절댓값 갖는 프레임 계산
-    cv::absdiff(gray, prevFrame, diffGesture);
+    cv::absdiff(blurred, prevFrame, diffGesture);
     // 이전 프레임 업데이트
     gray.copyTo(prevFrame);
     // 프레임 이진화
     cv::threshold(diffGesture, threshGesture, DIFF_THRESHOLD, 255, cv::THRESH_BINARY);
     // 모폴로지 연산. 침식 -> 팽창. 작은 노이즈 제거
-    cv::erode(diffGesture, diffGesture, cv::Mat(), cv::Point(-1, -1), MORPH_ITERATIONS);
-    cv::dilate(diffGesture, diffGesture, cv::Mat(), cv::Point(-1, -1), MORPH_ITERATIONS);
+    cv::erode(threshGesture, threshGesture, cv::Mat(), cv::Point(-1, -1), MORPH_ITERATIONS);
+    cv::dilate(threshGesture, threshGesture, cv::Mat(), cv::Point(-1, -1), MORPH_ITERATIONS);
     // X축 히스토그램 계산
     std::vector<int> histogram(threshGesture.cols, 0);
     for (int y = 0; y < threshGesture.rows; ++y) {
