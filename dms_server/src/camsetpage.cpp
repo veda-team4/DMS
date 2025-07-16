@@ -37,6 +37,7 @@ int camsetpage() {
     cv::Mat frame;
     cap >> frame;
     if (frame.empty()) break;
+    cv::flip(frame, frame, 1);
 
     // 얼굴 탐지 쓰레드를 위해 최신 프레임 공유
     {

@@ -63,6 +63,7 @@ int calibratepage(double* thresholdEAR) {
     cv::Mat frame;
     cap >> frame;
     if (frame.empty()) continue;
+    cv::flip(frame, frame, 1);
 
     // 얼굴 탐지 쓰레드를 위해 최신 프레임 공유
     {
@@ -167,6 +168,7 @@ int calibrateEyes(double& ear, bool opened) {
     cv::Mat frame;
     cap >> frame;
     if (frame.empty()) continue;
+    cv::flip(frame, frame, 1);
 
     // 얼굴 탐지 쓰레드를 위해 최신 프레임 공유
     {

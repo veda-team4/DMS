@@ -34,6 +34,7 @@ int startpage() {
     cv::Mat frame;
     cap >> frame;
     if (frame.empty()) break;
+    cv::flip(frame, frame, 1);
 
     // 제스처 검출 쓰레드를 위해 최신 프레임 공유
     {

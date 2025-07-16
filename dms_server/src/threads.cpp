@@ -194,7 +194,7 @@ void runGestureDetectionThread() {
         if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - latestTime).count() >= 1000) {
           {
             std::lock_guard<std::mutex> lock(timeMutex);
-            leftTime = latestTime = std::chrono::steady_clock::now();
+            rightTime = latestTime = std::chrono::steady_clock::now();
           }
         }
         motionScore = 0;
@@ -203,7 +203,7 @@ void runGestureDetectionThread() {
         if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - latestTime).count() >= 1000) {
           {
             std::lock_guard<std::mutex> lock(timeMutex);
-            rightTime = latestTime = std::chrono::steady_clock::now();
+            leftTime = latestTime = std::chrono::steady_clock::now();
           }
         }
         motionScore = 0;
