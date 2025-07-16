@@ -41,9 +41,9 @@ void Bluetooth::Init() {
 
     // options.c_cflag &= ~CRTSCTS;
     
-    // options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
-    // options.c_iflag &= ~(IXON | IXOFF | IXANY);
-    // options.c_oflag &= ~OPOST;
+    options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+    options.c_iflag &= ~(IXON | IXOFF | IXANY);
+    options.c_oflag &= ~OPOST;
 
     tcsetattr(fd, TCSANOW, &options);	//설정 내용 즉시 적용
 
@@ -54,12 +54,12 @@ void Bluetooth::Close() {
     close(fd);
 }
 void Bluetooth::HandleTx() {
-    //if(fd==-1) return;
+    if(fd==-1) return;
     write(fd, msg, strlen(msg));
     std::cout << "Tx : " << msg << std::endl;
 }
 void Bluetooth::HandleRx() {
-    //if(fd==-1) return;
+    if(fd==-1) return;
     int n = read(fd, buf, sizeof(buf) - 1);
     if (n > 0) {
         buf[n] = '\0';
@@ -67,7 +67,7 @@ void Bluetooth::HandleRx() {
     }
 }
 void Bluetooth::TxFunc() {
-    if (tx_flag > 5) {
+    if (tx_flag == 1) {
         tx_flag = 0;
         HandleTx();
     }
@@ -79,7 +79,7 @@ void Bluetooth::RxFunc() {
     FD_ZERO(&read_fds);
     FD_SET(fd, &read_fds);
 
-    timeout.tv_sec = 1;
+    timeout.tv_sec = 2;
     timeout.tv_usec = 0;
 
     int ret = select(fd + 1, &read_fds, NULL, NULL, &timeout);
