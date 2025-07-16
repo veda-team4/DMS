@@ -10,3 +10,4 @@ sudo reboot
 # 상단바 제거 
 ~/.config/wf-panel-pi.ini
 autohide=true
+
