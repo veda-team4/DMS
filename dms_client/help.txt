@@ -11,26 +11,3 @@ sudo reboot
 ~/.config/wf-panel-pi.ini
 autohide=true
 
-# Set to Speaker
-$ sudo vim /boot/firmware/config.txt
--> 해당 파일에 아래 명령어 추가
-dtoverlay=hifiberry-dac
-$ sudo reboot
-
-$ aplay -l
-
-card 3: sndrpihifiberry [snd_rpi_hifiberry_dac], device 0: HifiBerry DAC HiFi pcm5102a-hifi-0 [HifiBerry DAC HiFi pcm5102a-hifi-0]
-  Subdevices: 1/1
-  Subdevice #0: subdevice #0
-
--> card3, subdevice #0 확인= "plughw:3,0"
-
-# Speaker pinmap
-speaker		RSP
-
-LRC		BCM19
-BCLK		BCM18
-DIN		BCM21
-
-GND		Physical6
-VIN		Physical2
