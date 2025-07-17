@@ -14,9 +14,7 @@
 // ********** 눈 감김 감지 관련 상수 **********
 #define BLINK_WINDOW_MS 2000 // 분석 시간 윈도우 (2초)
 #define INCREASE_THRESH  2.0 // 고개 움직임 감지 최소 값
-#define INCREASE_THRESH2 0.1 // 고개 움직임 미감지 최대 값 (이 값보다 적게 아래로 내려가면 떨어짐 아님)
-#define INCREASE_TIME 0.3 // 고개 움직임 감지 최대 시간 값
-#define MAX_DOWN_COUNT 5 // 몇번 카운트 해야 경고할 것인지
+#define MAX_DOWN_COUNT 2 // 몇번 카운트 해야 경고할 것인지
 // ********************************************
 
 int monitorpage(double thresholdEAR) {
@@ -28,6 +26,11 @@ int monitorpage(double thresholdEAR) {
   // 고개 떨어짐 정보 저장 변수
   int downCount = 0; // 고개 떨어짐 횟수
   double earAvg = 0.0; // 양쪽 눈의 EAR 평균
+
+  // 시작 전에 blinkHistory 채워넣기
+  for(int i = 0; i < 100; ++i) {
+    blinkHistory.push_back({ std::chrono::steady_clock::now(), false });
+  }
 
   while (true) {
     // 클라이언트 측으로부터 "stop" 수신 시 종료
@@ -87,19 +90,6 @@ int monitorpage(double thresholdEAR) {
       double earL = computeEAR(landmarks, 36);
       double earR = computeEAR(landmarks, 42);
       earAvg = (computeEAR(landmarks, 36) + computeEAR(landmarks, 42)) / 2.0;
-
-      // 고개 떨어짐 계산. 27 ~ 30 코 랜드마크 평균 y값을 계산하여 이전 프레임의 평균 y값과 비교
-      static double prevNoseY = 1e50; // 이전 고개 좌표
-      double currentNose = 0.0;
-      for (int i = 27; i <= 30; ++i) {
-        currentNose += landmarks.part(30).y();
-      }
-      currentNose /= 4;
-
-      double diff = currentNose - prevNoseY;
-      static auto prevTime = std::chrono::steady_clock::now();
-      auto currTime = std::chrono::steady_clock::now();
-      double deltaTimeSec = std::chrono::duration_cast<std::chrono::milliseconds>(currTime - prevTime).count() / 1000.0;
       
       // 눈 감음 여부 계산. 감았을 시 closedCount 증가 및 경고 문구 출력
       bool isClosed = (earAvg < thresholdEAR);
@@ -109,22 +99,29 @@ int monitorpage(double thresholdEAR) {
           cv::Point(faceRect.left(), faceRect.top() - 10),
           cv::FONT_HERSHEY_SIMPLEX, 1.0,
           cv::Scalar(0, 0, 255), 2);
-      }
+        }
+
+      // { 현재 시간, 눈 감음 여부} 기록
+      blinkHistory.emplace_back(std::chrono::steady_clock::now(), isClosed);
+        
+      // 고개 떨어짐 계산. 얼굴 사각형 중앙 y 좌표로 계산
+      static double prevFaceY = 1e50; // 이전 고개 좌표
+      double currentFaceY = (faceRect.top() + faceRect.bottom()) / 2.0;
+      double diff = currentFaceY - prevFaceY;
+      prevFaceY = currentFaceY;
+
+      writeLog(std::string("diff: ") + std::to_string(diff));
       
       // 이전 좌표와 비교해서 INCREASE_THRESH 보다 크게 증가하면 downCount 증가
-      if (diff >= INCREASE_THRESH && deltaTimeSec < INCREASE_TIME && isClosed) {
+      if (diff > 0 && isClosed) {
         ++downCount;
       }
       // 이전 좌표와 비교해서 INCREASE_THRESH 보다 작게 증가하면 downCount 0 으로 초기화
-      else if (diff < INCREASE_THRESH2) {
+      else if (diff < 0) {
         downCount = 0;
       }
-      prevNoseY = currentNose;
-      prevTime = currTime;
 
-      // { 현재 시간, 눈 감음 여부} 기록
-      auto now = std::chrono::steady_clock::now();
-      blinkHistory.emplace_back(now, isClosed);
+      writeLog(std::string("downCount: ") + std::to_string(downCount));
     }
     else {
       blinkHistory.emplace_back(std::chrono::steady_clock::now(), false);

@@ -28,10 +28,14 @@ MonitorPage::MonitorPage(QWidget* parent, MainWindow* mainWindow, QLocalSocket* 
     ui->wakeupCloseButton->hide();
     wakeupFlashing = false;
     });
+
+  led = new Led();
+  speaker = new Speaker("plughw:3,0");
 }
 
 MonitorPage::~MonitorPage()
 {
+  led->led_off();
   delete wakeupTimer;
   delete ui;
 }
@@ -42,12 +46,16 @@ void MonitorPage::wakeupUI(bool on) {
     ui->wakeupLabel->show();
     ui->wakeupCloseButton->show();
     wakeupTimer->start(300);
+    led->led_on();
+    speaker->play("tts.wav");
   }
   else if (!on && wakeupFlashing) {
     wakeupFlashing = false;
     wakeupTimer->stop();
     ui->wakeupLabel->hide();
     ui->wakeupCloseButton->hide();
+    led->led_off();
+    // speaker->play("tts.wav");
   }
 }
 

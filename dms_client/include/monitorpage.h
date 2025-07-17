@@ -7,6 +7,8 @@
 #include <QTimer>
 #include "basepage.h"
 #include "mainwindow.h"
+#include "led.h"
+#include "speaker.h"
 
 extern bool gestureLock;
 
@@ -43,6 +45,9 @@ private:
   void wakeupUI(bool on);
 
   void readFrame();
+
+  Led* led;
+  Speaker* speaker;
 };
 
 #endif // MONITORPAGE_H
