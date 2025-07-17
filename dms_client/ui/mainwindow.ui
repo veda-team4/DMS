@@ -170,8 +170,8 @@ QPushButton:pressed {
      <rect>
       <x>8</x>
       <y>8</y>
-      <width>51</width>
-      <height>51</height>
+      <width>40</width>
+      <height>40</height>
      </rect>
     </property>
     <property name="text">

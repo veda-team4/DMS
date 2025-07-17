@@ -100,18 +100,7 @@ int monitorpage(double thresholdEAR) {
       static auto prevTime = std::chrono::steady_clock::now();
       auto currTime = std::chrono::steady_clock::now();
       double deltaTimeSec = std::chrono::duration_cast<std::chrono::milliseconds>(currTime - prevTime).count() / 1000.0;
-
-      // 이전 좌표와 비교해서 INCREASE_THRESH 보다 크게 증가하면 downCount 증가
-      if (diff >= INCREASE_THRESH && deltaTimeSec < INCREASE_TIME) {
-        ++downCount;
-      }
-      // 이전 좌표와 비교해서 INCREASE_THRESH 보다 작게 증가하면 downCount 0 으로 초기화
-      else if (diff < INCREASE_THRESH2) {
-        downCount = 0;
-      }
-      prevNoseY = currentNose;
-      prevTime = currTime;
-
+      
       // 눈 감음 여부 계산. 감았을 시 closedCount 증가 및 경고 문구 출력
       bool isClosed = (earAvg < thresholdEAR);
       if (isClosed) {
@@ -121,6 +110,17 @@ int monitorpage(double thresholdEAR) {
           cv::FONT_HERSHEY_SIMPLEX, 1.0,
           cv::Scalar(0, 0, 255), 2);
       }
+      
+      // 이전 좌표와 비교해서 INCREASE_THRESH 보다 크게 증가하면 downCount 증가
+      if (diff >= INCREASE_THRESH && deltaTimeSec < INCREASE_TIME && isClosed) {
+        ++downCount;
+      }
+      // 이전 좌표와 비교해서 INCREASE_THRESH 보다 작게 증가하면 downCount 0 으로 초기화
+      else if (diff < INCREASE_THRESH2) {
+        downCount = 0;
+      }
+      prevNoseY = currentNose;
+      prevTime = currTime;
 
       // { 현재 시간, 눈 감음 여부} 기록
       auto now = std::chrono::steady_clock::now();
