@@ -49,15 +49,10 @@ void Bluetooth::Init() {
 
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
 }
-
 void Bluetooth::Close() {
     close(fd);
 }
-void Bluetooth::HandleTx() {
-    if(fd==-1) return;
-    write(fd, msg, strlen(msg));
-    std::cout << "Tx : " << msg << std::endl;
-}
+
 void Bluetooth::HandleRx() {
     if(fd==-1) return;
     int n = read(fd, buf, sizeof(buf) - 1);
@@ -67,10 +62,9 @@ void Bluetooth::HandleRx() {
     }
 }
 void Bluetooth::TxFunc() {
-    if (tx_flag == 1) {
-        tx_flag = 0;
-        HandleTx();
-    }
+    if(fd==-1) return;
+    write(fd, msg, strlen(msg));
+    std::cout << "Tx : " << msg << std::endl;
 }
 void Bluetooth::RxFunc() {
     fd_set read_fds;
@@ -86,4 +80,8 @@ void Bluetooth::RxFunc() {
     if (ret > 0 && FD_ISSET(fd, &read_fds)) {
         HandleRx();
     }
+}
+void Bluetooth::Motor() {
+    TxFunc();
+    RxFunc();
 }
