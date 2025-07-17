@@ -70,7 +70,7 @@ void runGestureDetectionThread() {
   cv::Mat localFrame, prevFrame, gray, diffGesture, threshGesture;
   cv::Mat resized, ycrcb, mask, blurred, morph;
 
-  // YCrCb 살색 범위 (동양인 기준 넉넉하게)
+  // YCrCb 살색 범위
   cv::Scalar lower(0, 133, 77);
   cv::Scalar upper(255, 173, 127);
   
@@ -92,8 +92,7 @@ void runGestureDetectionThread() {
     break;
   }
   cv::resize(localFrame, resized, cv::Size(320, 240));
-  cv::cvtColor(resized, gray, cv::COLOR_BGR2GRAY);
-  cv::GaussianBlur(gray, prevFrame, cv::Size(5, 5), 0);
+  cv::cvtColor(resized, prevFrame, cv::COLOR_BGR2GRAY);
 
   while (running) {
     {
@@ -106,10 +105,8 @@ void runGestureDetectionThread() {
 
     // 해상도 축소
     cv::resize(localFrame, resized, cv::Size(320, 240));
-    // 블러 (노이즈 제거)
-    cv::GaussianBlur(resized, blurred, cv::Size(5, 5), 0);
     // 색상 공간 변환
-    cv::cvtColor(blurred, ycrcb, cv::COLOR_BGR2YCrCb);
+    cv::cvtColor(resized, ycrcb, cv::COLOR_BGR2YCrCb);
     // 살색 영역 마스크
     cv::inRange(ycrcb, lower, upper, mask);
     // 모폴로지 연산 (열기/닫기) - 잡음 제거
@@ -121,8 +118,14 @@ void runGestureDetectionThread() {
     double handRatio = (double)cv::countNonZero(morph) / (morph.rows * morph.cols);
 
     // 흰색 비율 임계값 넘을시 score 증가
-    if (handRatio >= STRETCH_RATIO_THRESHOLD && handRatio - prevHandRatio >= STRETCH_INCREASE_THRESHOLD) {
-      ++stretchScore;
+    if (handRatio >= STRETCH_RATIO_THRESHOLD) {
+      double gap = handRatio - prevHandRatio;
+      if (gap >= STRETCH_INCREASE_THRESHOLD) {
+        ++stretchScore;
+      }
+      else {
+        stretchScore = 0;
+      }
     }
     else {
       stretchScore = 0;
@@ -153,17 +156,15 @@ void runGestureDetectionThread() {
 
     // 복사해온 프레임 gray scale로 변환
     cv::cvtColor(resized, gray, cv::COLOR_BGR2GRAY);
-    // 가우시안 필터 적용하여 노이즈 감소
-    cv::GaussianBlur(gray, blurred, cv::Size(5, 5), 0);
     // 현재 프레임과 이전 프레임의 차이의 절댓값 갖는 프레임 계산
-    cv::absdiff(blurred, prevFrame, diffGesture);
+    cv::absdiff(gray, prevFrame, diffGesture);
     // 이전 프레임 업데이트
     gray.copyTo(prevFrame);
     // 프레임 이진화
     cv::threshold(diffGesture, threshGesture, DIFF_THRESHOLD, 255, cv::THRESH_BINARY);
     // 모폴로지 연산. 침식 -> 팽창. 작은 노이즈 제거
-    cv::erode(threshGesture, threshGesture, cv::Mat(), cv::Point(-1, -1), MORPH_ITERATIONS);
-    cv::dilate(threshGesture, threshGesture, cv::Mat(), cv::Point(-1, -1), MORPH_ITERATIONS);
+    cv::morphologyEx(mask, morph, cv::MORPH_OPEN, kernel);
+    cv::morphologyEx(morph, morph, cv::MORPH_CLOSE, kernel);
     // X축 히스토그램 계산
     std::vector<int> histogram(threshGesture.cols, 0);
     for (int y = 0; y < threshGesture.rows; ++y) {

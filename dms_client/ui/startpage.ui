@@ -102,9 +102,9 @@
   <widget class="QPushButton" name="nextButton">
    <property name="geometry">
     <rect>
-     <x>220</x>
+     <x>130</x>
      <y>400</y>
-     <width>200</width>
+     <width>380</width>
      <height>50</height>
     </rect>
    </property>
@@ -152,7 +152,7 @@ QPushButton:pressed {
 }</string>
    </property>
    <property name="text">
-    <string>Click to START</string>
+    <string>시작하려면 카메라에 손을 뻗어주세요</string>
    </property>
   </widget>
  </widget>

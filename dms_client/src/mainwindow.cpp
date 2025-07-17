@@ -11,9 +11,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
   // 상단 바 제거
   this->setWindowFlags(Qt::FramelessWindowHint);
 
-  // (0, 0) 으로 이동
-  // this->move(0, 0);
-
   // dragLabel에 이벤트 필터 설치
   ui->dragLabel->installEventFilter(this);
 

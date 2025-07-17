@@ -67,18 +67,11 @@ void StartPage::readSocket() {
       // 복호화된 평문에서 명령과 길이 추출
       quint8 cmd = static_cast<quint8>(decrypted[0]);
 
-      if (cmd == Protocol::RIGHT) {
-        if (!mainWindow->isLock()) {
-          ui->nextButton->click();
-        }
-        return;
-      }
-      else if (cmd == Protocol::LEFT) {
+      if (cmd == Protocol::RIGHT || cmd == Protocol::LEFT) {
         return;
       }
       else if (cmd == Protocol::STRETCH) {
-        mainWindow->updateLock();
-        writeEncryptedCommand(socket, (mainWindow->isLock() ? Protocol::LOCK : Protocol::UNLOCK));
+          ui->nextButton->click();
         return;
       }
       else {
