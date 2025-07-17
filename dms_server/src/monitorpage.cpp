@@ -13,8 +13,8 @@
 
 // ********** 눈 감김 감지 관련 상수 **********
 #define BLINK_WINDOW_MS 2000 // 분석 시간 윈도우 (2초)
-#define INCREASE_THRESH  2.0 // 고개 움직임 감지 최소 값
-#define MAX_DOWN_COUNT 2 // 몇번 카운트 해야 경고할 것인지
+#define INCREASE_THRESH  10 // 고개 움직임 감지 최소 값
+#define MAX_DOWN_COUNT 1 // 몇번 카운트 해야 경고할 것인지
 // ********************************************
 
 int monitorpage(double thresholdEAR) {
@@ -110,18 +110,14 @@ int monitorpage(double thresholdEAR) {
       double diff = currentFaceY - prevFaceY;
       prevFaceY = currentFaceY;
 
-      writeLog(std::string("diff: ") + std::to_string(diff));
-      
       // 이전 좌표와 비교해서 INCREASE_THRESH 보다 크게 증가하면 downCount 증가
-      if (diff > 0 && isClosed) {
+      if (diff > INCREASE_THRESH && isClosed) {
         ++downCount;
       }
       // 이전 좌표와 비교해서 INCREASE_THRESH 보다 작게 증가하면 downCount 0 으로 초기화
       else if (diff < 0) {
         downCount = 0;
       }
-
-      writeLog(std::string("downCount: ") + std::to_string(downCount));
     }
     else {
       blinkHistory.emplace_back(std::chrono::steady_clock::now(), false);
