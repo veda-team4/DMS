@@ -16,6 +16,9 @@ void HandleRx();
 void TxFunc();
 void RxFunc();
 
+int is_rfcomm_bound();
+int bind_rfcomm();
+
 public:
 void Motor();
 };

@@ -9,9 +9,12 @@
 #include <thread>
 #include <chrono>
 #include <sys/select.h>
+#include <sys/stat.h>
 
 #define BT_DEVICE "/dev/rfcomm0"
-
+#define DEVICE_PATH "/dev/rfcomm0"
+#define BT_ADDRESS "00:25:05:31:03:CA"
+#define RFCOMM_CMD "/usr/bin/rfcomm"
 
 Bluetooth::Bluetooth() {
     Init();
@@ -19,7 +22,6 @@ Bluetooth::Bluetooth() {
 Bluetooth::~Bluetooth() {
     Close();
 }
-
 
 void Bluetooth::Init() {
     fd = open("/dev/rfcomm0", O_RDWR | O_NOCTTY | O_NDELAY);
@@ -49,6 +51,7 @@ void Bluetooth::Init() {
 
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
 }
+
 void Bluetooth::Close() {
     close(fd);
 }
@@ -58,14 +61,16 @@ void Bluetooth::HandleRx() {
     int n = read(fd, buf, sizeof(buf) - 1);
     if (n > 0) {
         buf[n] = '\0';
-        std::cout << "Rx : " << buf << std::endl;
+        // std::cout << "Rx : " << buf << std::endl;
     }
 }
+
 void Bluetooth::TxFunc() {
     if(fd==-1) return;
     write(fd, msg, strlen(msg));
-    std::cout << "Tx : " << msg << std::endl;
+    // std::cout << "Tx : " << msg << std::endl;
 }
+
 void Bluetooth::RxFunc() {
     fd_set read_fds;
     struct timeval timeout;
@@ -81,6 +86,7 @@ void Bluetooth::RxFunc() {
         HandleRx();
     }
 }
+
 void Bluetooth::Motor() {
     TxFunc();
     RxFunc();

@@ -1,0 +1,45 @@
+
+
+
+# 블루투스 설치
+sudo apt install -y bluetooth bluez bluez-tools
+
+# 블루투스 컨트롤러 실행
+bluetoothctl
+
+# 블루투스 켜기
+power on
+# 페어링 에이전트 켜기
+agent on
+# 기본 에이전트 설정
+default-agent
+# 주변 기기 검색 HC-05(블루투스 모듈)의 MAC 주소 찾기
+scan on
+scan off
+# 기기 페어링
+pair 00:25:05:31:03:CA (MAC 주소)
+# 자동 연결 허용
+trust 00:25:05:31:03:CA
+# 시리얼 포트 바인딩
+sudo rfcomm bind /dev/rfcomm0 00:25:05:31:03:CA
+
+# systemd 서비스로 등록
+sudo nano /etc/systemd/system/rfcomm-bind.service
+
+[Unit]
+Description=RFCOMM Bluetooth Bind
+After=bluetooth.service
+Requires=bluetooth.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/rfcomm bind /dev/rfcomm0 00:25:05:31:03:CA
+ExecStop=/usr/bin/rfcomm release /dev/rfcomm0
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target
+
+sudo systemctl daemon-reload
+sudo systemctl enable rfcomm-bind
+sudo systemctl start rfcomm-bind
