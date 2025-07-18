@@ -18,6 +18,9 @@
 // ********************************************
 
 int monitorpage(double thresholdEAR) {
+  // 시작 시간 기록
+  auto startTime = std::chrono::steady_clock::now();
+
   // 눈 감음 정보 저장 변수
   std::deque<std::pair<std::chrono::steady_clock::time_point, bool>> blinkHistory;
   unsigned long long closedCount = 0;
@@ -26,11 +29,6 @@ int monitorpage(double thresholdEAR) {
   // 고개 떨어짐 정보 저장 변수
   int downCount = 0; // 고개 떨어짐 횟수
   double earAvg = 0.0; // 양쪽 눈의 EAR 평균
-
-  // 시작 전에 blinkHistory 채워넣기
-  for(int i = 0; i < 100; ++i) {
-    blinkHistory.push_back({ std::chrono::steady_clock::now(), false });
-  }
 
   while (true) {
     // 클라이언트 측으로부터 "stop" 수신 시 종료
@@ -94,15 +92,23 @@ int monitorpage(double thresholdEAR) {
       // 눈 감음 여부 계산. 감았을 시 closedCount 증가 및 경고 문구 출력
       bool isClosed = (earAvg < thresholdEAR);
       if (isClosed) {
-        ++closedCount;
         cv::putText(frame, "CLOSED",
           cv::Point(faceRect.left(), faceRect.top() - 10),
           cv::FONT_HERSHEY_SIMPLEX, 1.0,
           cv::Scalar(0, 0, 255), 2);
         }
 
-      // { 현재 시간, 눈 감음 여부} 기록
-      blinkHistory.emplace_back(std::chrono::steady_clock::now(), isClosed);
+      // { 현재 시간, 눈 감음 여부} 기록 / 2초 이전에는 떠있다고 체크 (비율 계산 안정성 위해)
+      if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - startTime).count() <= 2000) {
+        static int i = 0;
+        blinkHistory.emplace_back(std::chrono::steady_clock::now(), false);
+      }
+      else {
+        blinkHistory.emplace_back(std::chrono::steady_clock::now(), isClosed);
+        if(isClosed) {
+          ++closedCount;
+        }
+      }
         
       // 고개 떨어짐 계산. 얼굴 사각형 중앙 y 좌표로 계산
       static double prevFaceY = 1e50; // 이전 고개 좌표
@@ -124,7 +130,7 @@ int monitorpage(double thresholdEAR) {
     }
 
     // 2초간의 윈도우 초과한 항목 제거
-    while (!blinkHistory.empty() && std::chrono::duration_cast<std::chrono::milliseconds>(blinkHistory.back().first - blinkHistory.front().first).count() > BLINK_WINDOW_MS) {
+    while (!blinkHistory.empty() && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - blinkHistory.front().first).count() > BLINK_WINDOW_MS) {
       if (blinkHistory.front().second) --closedCount;
       blinkHistory.pop_front();
     }
