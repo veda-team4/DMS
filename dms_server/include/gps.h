@@ -1,11 +1,11 @@
-#ifndef GPS_H
-#define GPS_H
+#ifndef Gps_H
+#define Gps_H
 #include <string>
 
-class GPS {
+class Gps {
 public:
-    GPS(const std::string& device = "/dev/ttyS0", int baudrate = 9600);
-    ~GPS();
+    Gps(const std::string& device = "/dev/ttyS0", int baudrate = 9600);
+    ~Gps();
 
     bool cur_location(double* _latitute, double* _longitude);
 
@@ -13,7 +13,7 @@ private:
     int fd;
     int baudrate;
     std::string device;
-    double latitude, longitude;
+    double latitude = -1, longitude = -1;
 
     bool init();
     bool update();

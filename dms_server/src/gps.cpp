@@ -8,15 +8,13 @@
 #include <iostream>
 #include <cmath>
 
-GPS::GPS(const std::string& device, int baudrate)
-    : device(device), baudrate(baudrate), fd(-1) 
-{
+Gps::Gps(const std::string& device, int baudrate) : device(device), baudrate(baudrate), fd(-1) {
     if(!init()) {
-        std::cerr << "Failed to initialize GPS on device: " << device << std::endl;
+        std::cerr << "Failed to initialize Gps on device: " << device << std::endl;
     }
 }
 
-bool GPS::init() {
+bool Gps::init() {
     fd = open(device.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (fd < 0) {
         perror("open");
@@ -50,7 +48,7 @@ bool GPS::init() {
     return true;
 }
 
-bool GPS::update() {
+bool Gps::update() {
     fd_set readfds;
     FD_ZERO(&readfds);
     FD_SET(fd, &readfds);
@@ -78,9 +76,7 @@ bool GPS::update() {
     return false;
 }
 
-// 각 필드값 저장하는 함수
-void splitCSV(const std::string& line, std::vector<std::string>& fields)
-{
+void splitCSV(const std::string& line, std::vector<std::string>& fields) {
     std::stringstream ss(line);
     std::string token;
 
@@ -89,7 +85,7 @@ void splitCSV(const std::string& line, std::vector<std::string>& fields)
     }
 }
 
-double GPS::convertToDecimal(const std::string& raw, char direction) {
+double Gps::convertToDecimal(const std::string& raw, char direction) {
     double val = std::atof(raw.c_str());
     double degrees = std::floor(val / 100);
     double minutes = val - (degrees * 100);
@@ -98,7 +94,7 @@ double GPS::convertToDecimal(const std::string& raw, char direction) {
     return decimal; 
 }
 
-bool GPS::parseNMEA(const std::string& sentence) {
+bool Gps::parseNMEA(const std::string& sentence) {
     // 지원 문장인지 검사
     if (!(sentence.find("$GPRMC") == 0 || sentence.find("$GPGGA") == 0 ||
         sentence.find("$GNRMC") == 0 || sentence.find("$GNGGA") == 0 ||
@@ -145,15 +141,16 @@ bool GPS::parseNMEA(const std::string& sentence) {
     return true;
 }
 
-bool GPS::cur_location(double* _latitute, double* _longitude) {
-    if (!update()) {
+bool Gps::cur_location(double* _latitute, double* _longitude) {
+    if(latitude == -1 && longitude == -1) {
         return false;
     }
+    update();
     *_latitute = latitude;
     *_longitude = longitude;
     return true;
 }
 
-GPS::~GPS() {
+Gps::~Gps() {
     if (fd >= 0) close(fd);
 }
