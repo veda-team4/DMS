@@ -11,3 +11,29 @@ sudo reboot
 ~/.config/wf-panel-pi.ini
 autohide=true
 
+
+
+# 블루투스 설치
+sudo apt install -y bluetooth bluez bluez-tools
+
+# 블루투스 컨트롤러 실행
+bluetoothctl
+
+# 블루투스 켜기
+power on
+# 페어링 에이전트 켜기
+agent on
+# 기본 에이전트 설정
+default-agent
+# 주변 기기 검색 HC-05(블루투스 모듈)의 MAC 주소 찾기
+scan on
+scan off
+# 기기 페어링
+pair XX:XX:XX:XX:XX:XX(MAC 주소)
+# 자동 연결 허용
+trust XX:XX:XX:XX:XX:XX
+# 기기 연결
+//connect XX:XX:XX:XX:XX:XX
+
+# 시리얼 포트 바인딩
+sudo rfcomm bind /dev/rfcomm0 XX:XX:XX:XX:XX:XX
